@@ -11,7 +11,7 @@
       window.Module = {
         // THIS IS THE CORRECTED PATH FOR YOUR SMILE-RISE APP
         // It points to the .wasm file now located in SmileRise/public/models/
-        wasmBinaryFile: '%PUBLIC_URL%/models/opencv.wasm',
+        wasmBinaryFile: '/models/opencv.wasm',
         onRuntimeInitialized: function() {
           console.log('✅ OpenCV.js runtime initialized successfully');
           console.log('🔍 OpenCV version:', typeof cv !== 'undefined' && cv.getBuildInformation ? cv.getBuildInformation() : 'Version info not available');
@@ -36,7 +36,7 @@
         }
       });
     </script>
-    <script async src="%PUBLIC_URL%/models/opencv.js"
+    <script async src="/models/opencv.js"
             onload="console.log('📥 OpenCV.js script loaded successfully from %PUBLIC_URL%/models/opencv.js')"
             onerror="console.error('❌ Failed to load OpenCV.js script from %PUBLIC_URL%/models/opencv.js')"></script>
   </head>
