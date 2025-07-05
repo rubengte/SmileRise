@@ -1,0 +1,9 @@
+<!--
+    This file contains the description of some very simple features of Haar-like
+    features and will be used as a very simple face detector. The idea is that the
+    sum of the pixels in the areas covered by the first rectangle are subtracted
+    from the sum of pixels in the second area. If this value is above a certain
+    threshold, the rectangle is considered to contain a face.
+    
+    Note: This is a placeholder. The actual file will be loaded from your hosted URL.
+-->

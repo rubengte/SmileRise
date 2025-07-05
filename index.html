@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smile Detection - Extract Smiling Faces from Videos</title>
+    <meta name="description" content="Upload videos and automatically extract frames containing smiling faces using advanced facial recognition technology.">
+    <!-- Load OpenCV.js with proper error handling -->
+    <script>
+      window.Module = {
+        wasmBinaryFile: 'https://docs.opencv.org/4.8.0/opencv.js',
+        onRuntimeInitialized: function() {
+          console.log('✅ OpenCV.js runtime initialized successfully');
+          window.cvReady = true;
+          // Dispatch custom event when OpenCV is ready
+          window.dispatchEvent(new CustomEvent('opencv-ready'));
+        },
+        onAbort: function(what) {
+          console.error('❌ OpenCV.js failed to initialize:', what);
+          window.cvReady = false;
+        }
+      };
+    </script>
+    <script async src="https://docs.opencv.org/4.8.0/opencv.js" onload="console.log('📥 OpenCV.js script loaded')" onerror="console.error('❌ Failed to load OpenCV.js script')"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
