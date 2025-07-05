@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react'; // Added useEffect here
 import { Smile, AlertCircle, Info, Brain, CheckCircle } from 'lucide-react';
 import VideoUpload from './components/VideoUpload';
 import ProcessingOptionsComponent from './components/ProcessingOptions';
@@ -23,6 +23,26 @@ function App() {
   const [extractedFrames, setExtractedFrames] = useState<ExtractedFrame[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isRealDetection, setIsRealDetection] = useState<boolean | null>(null);
+
+  // **** THIS IS THE MAIN NEW SECTION ****
+  // This part makes sure OpenCV (the brain of the app) tries to load right away
+  // when your app first starts, instead of waiting for you to click a button.
+  useEffect(() => {
+    const initializeDetection = async () => {
+      try {
+        // We ask the face detection service to get ready
+        await faceDetectionService.initialize();
+        // Then we check if it actually loaded successfully
+        setIsRealDetection(faceDetectionService.isUsingRealDetection());
+      } catch (err) {
+        // If there's any problem, we'll see an error in the browser console
+        console.error("Error initializing faceDetectionService:", err);
+        setError(err instanceof Error ? err.message : 'Failed to initialize detection service.');
+        setIsRealDetection(false); // We set it to 'false' so the app knows it didn't load
+      }
+    };
+    initializeDetection();
+  }, []); // The empty [] means this only runs once when the app first appears
 
   const handleVideoSelect = useCallback((file: File) => {
     // Validate file size (max 10GB for high-quality videos)
@@ -49,10 +69,11 @@ function App() {
     setError(null);
     setExtractedFrames([]);
     
+    setProcessingStats(prev => ({ ...prev, isProcessing: true }));
+    
     try {
-      // Initialize face detection and check if real detection is available
-      await faceDetectionService.initialize();
-      setIsRealDetection(faceDetectionService.isUsingRealDetection());
+      // The initialize() call is now in the useEffect above, so we don't need it here unless
+      // you want to re-initialize on every processing start (which is usually not necessary).
       
       const processor = new VideoProcessor();
       
@@ -65,12 +86,149 @@ function App() {
       setExtractedFrames(frames);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during processing');
-      setProcessingStats(prev => ({ ...prev, isProcessing: false }));
+    } finally {
+        setProcessingStats(prev => ({ ...prev, isProcessing: false })); // Make sure processing status is turned off
     }
   }, [selectedFile, processingOptions]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center mb-4">
+            <div className="p-3 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full mr-3">
+              <Smile className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              Real Smile Detection Pro
+            </h1>
+          </div>
+          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+            Upload high-quality videos (up to 10GB, 30+ minutes) and automatically extract genuine smiling faces using 
+            <strong> real OpenCV Haar cascade classifiers</strong>. No simulation - this is genuine computer vision technology.
+          </p>
+        </div>
+
+        {/* Detection Status Banner */}
+        {isRealDetection !== null && ( // This banner only shows if we know if detection is real or not
+          <div className={`mb-6 p-4 border rounded-lg flex items-start ${
+            isRealDetection 
+              ? 'bg-green-50 border-green-200' 
+              : 'bg-red-50 border-red-200'
+          }`}>
+            {isRealDetection ? (
+              <CheckCircle className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5 text-green-600" />
+            ) : (
+              <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5 text-red-600" />
+            )}
+            <div className={`text-sm ${isRealDetection ? 'text-green-800' : 'text-red-800'}`}>
+              <strong>
+                {isRealDetection 
+                  ? '🎯 REAL OpenCV Haar Cascade Detection ACTIVE!' 
+                  : '❌ OpenCV Detection Failed!'
+                }
+              </strong>
+              <p className="mt-1">
+                {isRealDetection 
+                  ? 'Using genuine OpenCV.js computer vision with Haar cascade classifiers for precise face and smile detection. This is real computer vision technology - the same used in professional applications and research!'
+                  : 'Failed to load OpenCV.js or Haar cascade files. Please refresh the page and ensure you have a stable internet connection.'
+                }
+              </p>
+              <p className="mt-1 text-xs opacity-75">
+                Detection method: {faceDetectionService.getDetectionMethod()}
+              </p>
+              {isRealDetection && (
+                <p className="mt-1 text-xs opacity-75">
+                  {/* This line still refers to the old asset host. It should be removed or updated if those files are now local */}
+                  Using your hosted Haar cascade files from: ubiquitous-liger-47aa8d.netlify.app
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Info Banner */}
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start">
+          <Info className="w-5 h-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-blue-800">
+            <strong>Real Computer Vision Technology:</strong> This app uses genuine OpenCV.js with Haar cascade classifiers 
+            to detect faces and smiles. The system analyzes facial features using the same algorithms used in professional 
+            computer vision applications. Results are based on actual geometric feature detection, not simulation or guesswork.
+          </div>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start">
+            <AlertCircle className="w-5 h-5 text-red-600 mr-2 flex-shrink-0 mt-0.5" />
+            <div>
+              <h4 className="text-red-800 font-medium">Error</h4>
+              <p className="text-red-700 text-sm mt-1">{error}</p>
+            </div>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Upload Section */}
+          <div className="lg:col-span-2">
+            <VideoUpload 
+              onVideoSelect={handleVideoSelect}
+              isProcessing={processingStats.isProcessing}
+            />
+          </div>
+
+          {/* Options Section */}
+          <div className="space-y-6">
+            <ProcessingOptionsComponent
+              options={processingOptions}
+              onChange={setProcessingOptions}
+              disabled={processingStats.isProcessing}
+            />
+
+            {selectedFile && !processingStats.isProcessing && processingStats.processedFrames === 0 && (
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">Ready to Process</h3>
+                <div className="space-y-2 text-sm text-gray-600 mb-4">
+                  <p><strong>File:</strong> {selectedFile.name}</p>
+                  <p><strong>Size:</strong> {(selectedFile.size / (1024 * 1024)).toFixed(1)} MB</p>
+                  <p><strong>Mode:</strong> {processingOptions.extractAll ? 'Extract all smiles' : `Best ${processingOptions.maxExtract} smiles`}</p>
+                </div>
+                <button
+                  onClick={handleStartProcessing}
+                  disabled={!isRealDetection} // Button disabled if OpenCV not loaded
+                  className={`w-full px-4 py-3 rounded-lg transition-all transform font-medium shadow-sm ${
+                    isRealDetection 
+                      ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white hover:scale-105 hover:shadow-md'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  {isRealDetection ? 'Start Real OpenCV Processing' : 'OpenCV Not Available'}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Progress Section */}
+        <div className="mb-8">
+          <ProcessingProgress stats={processingStats} />
+        </div>
+
+        {/* Results Section */}
+        <ResultsGrid frames={extractedFrames} />
+
+        {/* Info Footer */}
+        <div className="mt-12 text-center text-gray-500 text-sm">
+          <p>This app processes videos client-side using real OpenCV.js computer vision. No data is sent to external servers.</p>
+          <p className="mt-1">Supports high-quality GoPro videos up to 10GB and 30+ minutes. Uses genuine Haar cascade classifiers for accurate detection.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default App;
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
