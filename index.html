@@ -45,3 +45,16 @@
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
+          console.error('❌ OpenCV.js script error:', e.error);
+        }
+      });
+    </script>
+    <script async src="%PUBLIC_URL%/models/opencv.js"
+            onload="console.log('📥 OpenCV.js script loaded successfully from %PUBLIC_URL%/models/opencv.js')"
+            onerror="console.error('❌ Failed to load OpenCV.js script from %PUBLIC_URL%/models/opencv.js')"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
