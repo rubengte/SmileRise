@@ -55,7 +55,7 @@ export class FaceDetectionService {
 
       // Fallback polling with extended timeout for large OpenCV files
       let attempts = 0;
-      const maxAttempts = 600; // 60 seconds with 100ms intervals for large files
+      const maxAttempts = 1200; // 120 seconds with 100ms intervals for large files
       
       const checkOpenCV = () => {
         attempts++;
@@ -70,7 +70,7 @@ export class FaceDetectionService {
         } else if (attempts >= maxAttempts) {
           window.removeEventListener('opencv-ready', onOpenCVReady);
           clearTimeout(timeout);
-          reject(new Error('OpenCV.js failed to load within 60 seconds. The files may be too large or there may be a network issue.'));
+          reject(new Error('OpenCV.js failed to load within 120 seconds. The files may be too large or there may be a network issue.'));
         } else {
           setTimeout(checkOpenCV, 100);
         }
@@ -80,7 +80,7 @@ export class FaceDetectionService {
       const timeout = setTimeout(() => {
         window.removeEventListener('opencv-ready', onOpenCVReady);
         reject(new Error('OpenCV.js loading timeout - this can happen with large files over slow connections'));
-      }, 70000); // 70 second total timeout for large files
+      }, 130000); // 130 second total timeout for large files
 
       checkOpenCV();
     });
