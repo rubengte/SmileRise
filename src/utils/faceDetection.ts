@@ -13,7 +13,7 @@ export class FaceDetectionService {
       // Wait for OpenCV.js to be ready
       await this.waitForOpenCV();
       
-      // Load Haar cascades from your hosted URLs
+      // Load Haar cascades from local files
       await this.loadHaarCascades();
       
       this.detectionMethod = 'opencv';
@@ -94,28 +94,33 @@ export class FaceDetectionService {
     }
 
     try {
-      console.log('📥 Loading Haar cascade files from your hosted URLs...');
+      console.log('📥 Loading Haar cascade files from local models folder...');
       
-      // Load face cascade with retry logic
-      console.log('Loading face cascade...');
-      const faceResponse = await this.fetchWithRetry('https://ubiquitous-liger-47aa8d.netlify.app/models/haarcascade_frontalface_default.xml');
+      // Load face cascade from local file
+      console.log('Loading face cascade from /models/haarcascade_frontalface_default.xml...');
+      const faceResponse = await this.fetchWithRetry('/models/haarcascade_frontalface_default.xml');
       const faceXmlText = await faceResponse.text();
       console.log(`✅ Face cascade loaded (${faceXmlText.length} characters)`);
       
-      // Validate XML content
-      if (!faceXmlText.includes('<opencv_storage>') || !faceXmlText.includes('haarcascade_frontalface')) {
-        throw new Error('Invalid face cascade XML content');
-      }
-      
-      // Load smile cascade with retry logic
-      console.log('Loading smile cascade...');
-      const smileResponse = await this.fetchWithRetry('https://ubiquitous-liger-47aa8d.netlify.app/models/haarcascade_smile.xml');
+      // Load smile cascade from local file
+      console.log('Loading smile cascade from /models/haarcascade_smile.xml...');
+      const smileResponse = await this.fetchWithRetry('/models/haarcascade_smile.xml');
       const smileXmlText = await smileResponse.text();
       console.log(`✅ Smile cascade loaded (${smileXmlText.length} characters)`);
       
+      // Check if we got actual XML content or placeholder content
+      if (faceXmlText.includes('This file contains the description of some very simple features') ||
+          smileXmlText.includes('This file contains the description of Haar-like features')) {
+        throw new Error('Haar cascade files contain placeholder content. Please ensure actual XML files are in /public/models/');
+      }
+      
       // Validate XML content
-      if (!smileXmlText.includes('<opencv_storage>') || !smileXmlText.includes('haarcascade_smile')) {
-        throw new Error('Invalid smile cascade XML content');
+      if (!faceXmlText.includes('<opencv_storage>')) {
+        throw new Error('Invalid face cascade XML content - missing opencv_storage tag');
+      }
+      
+      if (!smileXmlText.includes('<opencv_storage>')) {
+        throw new Error('Invalid smile cascade XML content - missing opencv_storage tag');
       }
       
       // Create file names for OpenCV's virtual file system
@@ -145,7 +150,7 @@ export class FaceDetectionService {
       }
       
       console.log('🎯 Both Haar cascade classifiers loaded and ready!');
-      console.log('📍 Using your hosted cascade files for maximum reliability');
+      console.log('📍 Using local cascade files for maximum reliability');
       
     } catch (error) {
       console.error('❌ Error loading Haar cascades:', error);
@@ -291,7 +296,7 @@ export class FaceDetectionService {
 
   getDetectionMethod(): string {
     if (this.detectionMethod === 'opencv') {
-      return 'Real OpenCV Haar Cascades (Your Hosted Files)';
+      return 'Real OpenCV Haar Cascades (Local Files)';
     } else {
       return 'Detection Failed - OpenCV Not Available';
     }

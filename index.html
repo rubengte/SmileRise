@@ -9,8 +9,6 @@
     <script>
       console.log('🔧 Setting up OpenCV.js module configuration...');
       window.Module = {
-        // THIS IS THE CORRECTED PATH FOR YOUR SMILE-RISE APP
-        // It points to the .wasm file now located in SmileRise/public/models/
         wasmBinaryFile: '/models/opencv.wasm',
         onRuntimeInitialized: function() {
           console.log('✅ OpenCV.js runtime initialized successfully');
@@ -37,21 +35,8 @@
       });
     </script>
     <script async src="/models/opencv.js"
-            onload="console.log('📥 OpenCV.js script loaded successfully from %PUBLIC_URL%/models/opencv.js')"
-            onerror="console.error('❌ Failed to load OpenCV.js script from %PUBLIC_URL%/models/opencv.js')"></script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
-          console.error('❌ OpenCV.js script error:', e.error);
-        }
-      });
-    </script>
-    <script async src="/models/opencv.js"
-            onload="console.log('📥 OpenCV.js script loaded successfully from %PUBLIC_URL%/models/opencv.js')"
-            onerror="console.error('❌ Failed to load OpenCV.js script from %PUBLIC_URL%/models/opencv.js')"></script>
+            onload="console.log('📥 OpenCV.js script loaded successfully from /models/opencv.js')"
+            onerror="console.error('❌ Failed to load OpenCV.js script from /models/opencv.js')"></script>
   </head>
   <body>
     <div id="root"></div>

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'; // Added useEffect here
+import React, { useState, useCallback, useEffect } from 'react';
 import { Smile, AlertCircle, Info, Brain, CheckCircle } from 'lucide-react';
 import VideoUpload from './components/VideoUpload';
 import ProcessingOptionsComponent from './components/ProcessingOptions';
@@ -24,25 +24,19 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [isRealDetection, setIsRealDetection] = useState<boolean | null>(null);
 
-  // **** THIS IS THE MAIN NEW SECTION ****
-  // This part makes sure OpenCV (the brain of the app) tries to load right away
-  // when your app first starts, instead of waiting for you to click a button.
   useEffect(() => {
     const initializeDetection = async () => {
       try {
-        // We ask the face detection service to get ready
         await faceDetectionService.initialize();
-        // Then we check if it actually loaded successfully
         setIsRealDetection(faceDetectionService.isUsingRealDetection());
       } catch (err) {
-        // If there's any problem, we'll see an error in the browser console
         console.error("Error initializing faceDetectionService:", err);
         setError(err instanceof Error ? err.message : 'Failed to initialize detection service.');
-        setIsRealDetection(false); // We set it to 'false' so the app knows it didn't load
+        setIsRealDetection(false);
       }
     };
     initializeDetection();
-  }, []); // The empty [] means this only runs once when the app first appears
+  }, []);
 
   const handleVideoSelect = useCallback((file: File) => {
     // Validate file size (max 10GB for high-quality videos)
@@ -72,9 +66,6 @@ function App() {
     setProcessingStats(prev => ({ ...prev, isProcessing: true }));
     
     try {
-      // The initialize() call is now in the useEffect above, so we don't need it here unless
-      // you want to re-initialize on every processing start (which is usually not necessary).
-      
       const processor = new VideoProcessor();
       
       const frames = await processor.processVideo(
@@ -87,7 +78,7 @@ function App() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during processing');
     } finally {
-        setProcessingStats(prev => ({ ...prev, isProcessing: false })); // Make sure processing status is turned off
+        setProcessingStats(prev => ({ ...prev, isProcessing: false }));
     }
   }, [selectedFile, processingOptions]);
 
@@ -111,7 +102,7 @@ function App() {
         </div>
 
         {/* Detection Status Banner */}
-        {isRealDetection !== null && ( // This banner only shows if we know if detection is real or not
+        {isRealDetection !== null && (
           <div className={`mb-6 p-4 border rounded-lg flex items-start ${
             isRealDetection 
               ? 'bg-green-50 border-green-200' 
@@ -132,7 +123,7 @@ function App() {
               <p className="mt-1">
                 {isRealDetection 
                   ? 'Using genuine OpenCV.js computer vision with Haar cascade classifiers for precise face and smile detection. This is real computer vision technology - the same used in professional applications and research!'
-                  : 'Failed to load OpenCV.js or Haar cascade files. Please refresh the page and ensure you have a stable internet connection.'
+                  : 'Failed to load OpenCV.js or Haar cascade files. Please ensure the files are properly placed in the /public/models/ folder.'
                 }
               </p>
               <p className="mt-1 text-xs opacity-75">
@@ -140,8 +131,7 @@ function App() {
               </p>
               {isRealDetection && (
                 <p className="mt-1 text-xs opacity-75">
-                  {/* This line still refers to the old asset host. It should be removed or updated if those files are now local */}
-                  Using your hosted Haar cascade files from: ubiquitous-liger-47aa8d.netlify.app
+                  Using local Haar cascade files from /public/models/
                 </p>
               )}
             </div>
@@ -196,7 +186,7 @@ function App() {
                 </div>
                 <button
                   onClick={handleStartProcessing}
-                  disabled={!isRealDetection} // Button disabled if OpenCV not loaded
+                  disabled={!isRealDetection}
                   className={`w-full px-4 py-3 rounded-lg transition-all transform font-medium shadow-sm ${
                     isRealDetection 
                       ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white hover:scale-105 hover:shadow-md'
