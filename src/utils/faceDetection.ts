@@ -13,7 +13,7 @@ export class FaceDetectionService {
       // Wait for OpenCV.js to be ready
       await this.waitForOpenCV();
       
-      // Load Haar cascades from local files
+      // Load Haar cascades from Netlify deployment
       await this.loadHaarCascades();
       
       this.detectionMethod = 'opencv';
@@ -53,9 +53,9 @@ export class FaceDetectionService {
 
       window.addEventListener('opencv-ready', onOpenCVReady);
 
-      // Fallback polling with extended timeout
+      // Fallback polling with extended timeout for large OpenCV files
       let attempts = 0;
-      const maxAttempts = 300; // 30 seconds with 100ms intervals
+      const maxAttempts = 600; // 60 seconds with 100ms intervals for large files
       
       const checkOpenCV = () => {
         attempts++;
@@ -70,17 +70,17 @@ export class FaceDetectionService {
         } else if (attempts >= maxAttempts) {
           window.removeEventListener('opencv-ready', onOpenCVReady);
           clearTimeout(timeout);
-          reject(new Error('OpenCV.js failed to load within 30 seconds. Please refresh the page and check your internet connection.'));
+          reject(new Error('OpenCV.js failed to load within 60 seconds. The files may be too large or there may be a network issue.'));
         } else {
           setTimeout(checkOpenCV, 100);
         }
       };
       
-      // Set overall timeout
+      // Set overall timeout for large files
       const timeout = setTimeout(() => {
         window.removeEventListener('opencv-ready', onOpenCVReady);
-        reject(new Error('OpenCV.js loading timeout'));
-      }, 35000); // 35 second total timeout
+        reject(new Error('OpenCV.js loading timeout - this can happen with large files over slow connections'));
+      }, 70000); // 70 second total timeout for large files
 
       checkOpenCV();
     });
@@ -94,24 +94,24 @@ export class FaceDetectionService {
     }
 
     try {
-      console.log('📥 Loading Haar cascade files from local models folder...');
+      console.log('📥 Loading Haar cascade files from Netlify deployment...');
       
-      // Load face cascade from local file
-      console.log('Loading face cascade from /models/haarcascade_frontalface_default.xml...');
-      const faceResponse = await this.fetchWithRetry('/models/haarcascade_frontalface_default.xml');
+      // Load face cascade from Netlify
+      console.log('Loading face cascade from Netlify...');
+      const faceResponse = await this.fetchWithRetry('https://quiet-gnome-7a845c.netlify.app/models/haarcascade_frontalface_default.xml');
       const faceXmlText = await faceResponse.text();
       console.log(`✅ Face cascade loaded (${faceXmlText.length} characters)`);
       
-      // Load smile cascade from local file
-      console.log('Loading smile cascade from /models/haarcascade_smile.xml...');
-      const smileResponse = await this.fetchWithRetry('/models/haarcascade_smile.xml');
+      // Load smile cascade from Netlify
+      console.log('Loading smile cascade from Netlify...');
+      const smileResponse = await this.fetchWithRetry('https://quiet-gnome-7a845c.netlify.app/models/haarcascade_smile.xml');
       const smileXmlText = await smileResponse.text();
       console.log(`✅ Smile cascade loaded (${smileXmlText.length} characters)`);
       
       // Check if we got actual XML content or placeholder content
       if (faceXmlText.includes('This file contains the description of some very simple features') ||
           smileXmlText.includes('This file contains the description of Haar-like features')) {
-        throw new Error('Haar cascade files contain placeholder content. Please ensure actual XML files are in /public/models/');
+        throw new Error('Haar cascade files contain placeholder content. Please ensure actual XML files are uploaded to Netlify.');
       }
       
       // Validate XML content
@@ -150,7 +150,7 @@ export class FaceDetectionService {
       }
       
       console.log('🎯 Both Haar cascade classifiers loaded and ready!');
-      console.log('📍 Using local cascade files for maximum reliability');
+      console.log('📍 Using Netlify-hosted cascade files for maximum reliability');
       
     } catch (error) {
       console.error('❌ Error loading Haar cascades:', error);
@@ -158,11 +158,14 @@ export class FaceDetectionService {
     }
   }
 
-  private async fetchWithRetry(url: string, maxRetries: number = 3): Promise<Response> {
+  private async fetchWithRetry(url: string, maxRetries: number = 5): Promise<Response> {
     for (let i = 0; i < maxRetries; i++) {
       try {
         console.log(`Attempting to fetch ${url} (attempt ${i + 1}/${maxRetries})`);
-        const response = await fetch(url);
+        const response = await fetch(url, {
+          mode: 'cors',
+          cache: 'default'
+        });
         
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -296,7 +299,7 @@ export class FaceDetectionService {
 
   getDetectionMethod(): string {
     if (this.detectionMethod === 'opencv') {
-      return 'Real OpenCV Haar Cascades (Local Files)';
+      return 'Real OpenCV Haar Cascades (Netlify CDN)';
     } else {
       return 'Detection Failed - OpenCV Not Available';
     }

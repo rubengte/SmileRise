@@ -9,7 +9,7 @@
     <script>
       console.log('🔧 Setting up OpenCV.js module configuration...');
       window.Module = {
-        wasmBinaryFile: '/models/opencv.wasm',
+        wasmBinaryFile: 'https://quiet-gnome-7a845c.netlify.app/models/opencv.wasm',
         onRuntimeInitialized: function() {
           console.log('✅ OpenCV.js runtime initialized successfully');
           console.log('🔍 OpenCV version:', typeof cv !== 'undefined' && cv.getBuildInformation ? cv.getBuildInformation() : 'Version info not available');
@@ -34,9 +34,9 @@
         }
       });
     </script>
-    <script async src="/models/opencv.js"
-            onload="console.log('📥 OpenCV.js script loaded successfully from /models/opencv.js')"
-            onerror="console.error('❌ Failed to load OpenCV.js script from /models/opencv.js')"></script>
+    <script async src="https://quiet-gnome-7a845c.netlify.app/models/opencv.js"
+            onload="console.log('📥 OpenCV.js script loaded successfully from Netlify')"
+            onerror="console.error('❌ Failed to load OpenCV.js script from Netlify')"></script>
   </head>
   <body>
     <div id="root"></div>
