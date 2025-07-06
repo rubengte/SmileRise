@@ -123,7 +123,7 @@ function App() {
               <p className="mt-1">
                 {isRealDetection 
                   ? 'Using genuine OpenCV.js computer vision with Haar cascade classifiers for precise face and smile detection. This is real computer vision technology - the same used in professional applications and research!'
-                  : 'Failed to load OpenCV.js or Haar cascade files. Please ensure the files are properly placed in the /public/models/ folder.'
+                  : 'Failed to load OpenCV.js or Haar cascade files. The files may be loading from Netlify - please wait a moment and refresh if needed.'
                 }
               </p>
               <p className="mt-1 text-xs opacity-75">
@@ -131,7 +131,7 @@ function App() {
               </p>
               {isRealDetection && (
                 <p className="mt-1 text-xs opacity-75">
-                  Using local Haar cascade files from /public/models/
+                  Using Netlify-hosted Haar cascade files for reliable access
                 </p>
               )}
             </div>
@@ -145,6 +145,8 @@ function App() {
             <strong>Real Computer Vision Technology:</strong> This app uses genuine OpenCV.js with Haar cascade classifiers 
             to detect faces and smiles. The system analyzes facial features using the same algorithms used in professional 
             computer vision applications. Results are based on actual geometric feature detection, not simulation or guesswork.
+            <br />
+            <strong>Note:</strong> OpenCV files are loaded from Netlify CDN for reliability. Initial loading may take 30-60 seconds for large files.
           </div>
         </div>
 
@@ -193,7 +195,7 @@ function App() {
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                 >
-                  {isRealDetection ? 'Start Real OpenCV Processing' : 'OpenCV Not Available'}
+                  {isRealDetection ? 'Start Real OpenCV Processing' : 'OpenCV Loading...'}
                 </button>
               </div>
             )}
@@ -212,6 +214,7 @@ function App() {
         <div className="mt-12 text-center text-gray-500 text-sm">
           <p>This app processes videos client-side using real OpenCV.js computer vision. No data is sent to external servers.</p>
           <p className="mt-1">Supports high-quality GoPro videos up to 10GB and 30+ minutes. Uses genuine Haar cascade classifiers for accurate detection.</p>
+          <p className="mt-1">OpenCV files hosted on Netlify CDN for reliable global access.</p>
         </div>
       </div>
     </div>
