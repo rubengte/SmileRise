@@ -6,37 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Smile Detection - Extract Smiling Faces from Videos</title>
     <meta name="description" content="Upload videos and automatically extract frames containing smiling faces using advanced facial recognition technology.">
-    <script>
-      console.log('🔧 Setting up OpenCV.js module configuration...');
-      window.Module = {
-        wasmBinaryFile: '/models/opencv.wasm',
-        onRuntimeInitialized: function() {
-          console.log('✅ OpenCV.js runtime initialized successfully');
-          console.log('🔍 OpenCV version:', typeof cv !== 'undefined' && cv.getBuildInformation ? cv.getBuildInformation() : 'Version info not available');
-          window.cvReady = true;
-          window.dispatchEvent(new CustomEvent('opencv-ready'));
-        },
-        onAbort: function(what) {
-          console.error('❌ OpenCV.js failed to initialize:', what);
-          window.cvReady = false;
-        },
-        print: function(text) {
-          console.log('OpenCV:', text);
-        },
-        printErr: function(text) {
-          console.error('OpenCV Error:', text);
-        }
-      };
-
-      window.addEventListener('error', function(e) {
-        if (e.filename && e.filename.includes('opencv.js')) {
-          console.error('❌ OpenCV.js script error:', e.error);
-        }
-      });
-    </script>
-    <script async src="/models/opencv.js"
-            onload="console.log('📥 OpenCV.js script loaded successfully from local files')"
-            onerror="console.error('❌ Failed to load OpenCV.js script from local files')"></script>
   </head>
   <body>
     <div id="root"></div>

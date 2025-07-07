@@ -97,7 +97,7 @@ function App() {
           </div>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
             Upload high-quality videos (up to 10GB, 30+ minutes) and automatically extract genuine smiling faces using 
-            <strong> real OpenCV Haar cascade classifiers</strong>. No simulation - this is genuine computer vision technology.
+            <strong> hybrid ML + computer vision technology</strong>. Combines Face-API.js machine learning with geometric analysis for superior accuracy.
           </p>
         </div>
 
