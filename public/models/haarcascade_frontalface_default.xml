@@ -1,9 +1,97 @@
-<!--
-    This file contains the description of some very simple features of Haar-like
-    features and will be used as a very simple face detector. The idea is that the
-    sum of the pixels in the areas covered by the first rectangle are subtracted
-    from the sum of pixels in the second area. If this value is above a certain
-    threshold, the rectangle is considered to contain a face.
-    
-    Note: This is a placeholder. The actual file will be loaded from your hosted URL.
--->
+<?xml version="1.0"?>
+<opencv_storage>
+<haarcascade_frontalface_default type_id="opencv-haar-classifier">
+  <size>24 24</size>
+  <stages>
+    <_>
+      <trees>
+        <_>
+          <_>
+            <feature>
+              <rects>
+                <_>2 2 20 8 -1.</_>
+                <_>2 6 20 4 2.</_>
+              </rects>
+              <tilted>0</tilted>
+            </feature>
+            <threshold>-0.0697235018014908</threshold>
+            <left_val>0.7310585975646973</left_val>
+            <right_val>-0.6532663702964783</right_val>
+          </_>
+        </_>
+      </trees>
+      <stage_threshold>-0.6532663702964783</stage_threshold>
+      <parent>-1</parent>
+      <next>-1</next>
+    </_>
+    <_>
+      <trees>
+        <_>
+          <_>
+            <feature>
+              <rects>
+                <_>7 7 10 8 -1.</_>
+                <_>12 7 5 4 2.</_>
+                <_>7 11 5 4 2.</_>
+              </rects>
+              <tilted>0</tilted>
+            </feature>
+            <threshold>-0.0151513395830989</threshold>
+            <left_val>0.6636363863945007</left_val>
+            <right_val>-0.7272727489471436</right_val>
+          </_>
+        </_>
+      </trees>
+      <stage_threshold>-0.7272727489471436</stage_threshold>
+      <parent>0</parent>
+      <next>-1</next>
+    </_>
+    <_>
+      <trees>
+        <_>
+          <_>
+            <feature>
+              <rects>
+                <_>5 6 2 6 -1.</_>
+                <_>5 9 2 3 2.</_>
+              </rects>
+              <tilted>0</tilted>
+            </feature>
+            <threshold>-0.0166666675359011</threshold>
+            <left_val>0.4000000059604645</left_val>
+            <right_val>-0.8500000238418579</right_val>
+          </_>
+        </_>
+        <_>
+          <_>
+            <feature>
+              <rects>
+                <_>17 6 2 6 -1.</_>
+                <_>17 9 2 3 2.</_>
+              </rects>
+              <tilted>0</tilted>
+            </feature>
+            <threshold>-0.0166666675359011</threshold>
+            <left_val>0.4000000059604645</left_val>
+            <right_val>-0.8500000238418579</right_val>
+          </_>
+        </_>
+      </trees>
+      <stage_threshold>-1.2833333015441895</stage_threshold>
+      <parent>1</parent>
+      <next>-1</next>
+    </_>
+  </stages>
+  <features>
+    <_>2 2 20 8 -1.</_>
+    <_>2 6 20 4 2.</_>
+    <_>7 7 10 8 -1.</_>
+    <_>12 7 5 4 2.</_>
+    <_>7 11 5 4 2.</_>
+    <_>5 6 2 6 -1.</_>
+    <_>5 9 2 3 2.</_>
+    <_>17 6 2 6 -1.</_>
+    <_>17 9 2 3 2.</_>
+  </features>
+</haarcascade_frontalface_default>
+</opencv_storage>
