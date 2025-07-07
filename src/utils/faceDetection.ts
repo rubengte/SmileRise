@@ -1,190 +1,53 @@
+import * as faceapi from 'face-api.js';
+
 export class FaceDetectionService {
   private initialized = false;
-  private detectionMethod: 'opencv' | 'fallback' = 'fallback';
-  private faceCascade: any = null;
-  private smileCascade: any = null;
+  private detectionMethod: 'faceapi-hybrid' | 'fallback' = 'fallback';
+  private modelsLoaded = false;
 
   async initialize(): Promise<void> {
     if (this.initialized) return;
 
-    console.log('🔄 Initializing OpenCV.js face detection...');
+    console.log('🔄 Initializing Face-API.js with hybrid geometric smile detection...');
     
     try {
-      // Wait for OpenCV.js to be ready
-      await this.waitForOpenCV();
+      // Load Face-API.js models
+      await this.loadFaceAPIModels();
       
-      // Load Haar cascades from Netlify deployment
-      await this.loadHaarCascades();
-      
-      this.detectionMethod = 'opencv';
+      this.detectionMethod = 'faceapi-hybrid';
       this.initialized = true;
+      this.modelsLoaded = true;
       
-      console.log('✅ Real OpenCV.js with Haar cascades loaded successfully!');
-      console.log('🎯 Using genuine computer vision for face and smile detection');
+      console.log('✅ Face-API.js hybrid detection system loaded successfully!');
+      console.log('🎯 Using ML landmarks + geometric analysis for genuine smile detection');
       
     } catch (error) {
-      console.error('❌ Failed to initialize OpenCV.js:', error);
+      console.error('❌ Failed to initialize Face-API.js:', error);
       this.detectionMethod = 'fallback';
       this.initialized = true;
-      throw new Error(`OpenCV initialization failed: ${error}`);
+      throw new Error(`Face-API.js initialization failed: ${error}`);
     }
   }
 
-  private async waitForOpenCV(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      // Check if OpenCV is already loaded and ready
-      if (typeof (window as any).cv !== 'undefined' && 
-          (window as any).cv.Mat && 
-          (window as any).cvReady === true) {
-        console.log('✅ OpenCV.js already loaded and ready');
-        resolve();
-        return;
-      }
-
-      // Listen for the opencv-ready event
-      const onOpenCVReady = () => {
-        if (typeof (window as any).cv !== 'undefined' && (window as any).cv.Mat) {
-          console.log('✅ OpenCV.js loaded via event listener');
-          window.removeEventListener('opencv-ready', onOpenCVReady);
-          clearTimeout(timeout);
-          resolve();
-        }
-      };
-
-      window.addEventListener('opencv-ready', onOpenCVReady);
-
-      // Fallback polling with extended timeout for large OpenCV files
-      let attempts = 0;
-      const maxAttempts = 1200; // 120 seconds with 100ms intervals for large files
-      
-      const checkOpenCV = () => {
-        attempts++;
-        
-        if (typeof (window as any).cv !== 'undefined' && 
-            (window as any).cv.Mat && 
-            (window as any).cvReady === true) {
-          console.log(`✅ OpenCV.js loaded after ${attempts * 100}ms`);
-          window.removeEventListener('opencv-ready', onOpenCVReady);
-          clearTimeout(timeout);
-          resolve();
-        } else if (attempts >= maxAttempts) {
-          window.removeEventListener('opencv-ready', onOpenCVReady);
-          clearTimeout(timeout);
-          reject(new Error('OpenCV.js failed to load within 120 seconds. The files may be too large or there may be a network issue.'));
-        } else {
-          setTimeout(checkOpenCV, 100);
-        }
-      };
-      
-      // Set overall timeout for large files
-      const timeout = setTimeout(() => {
-        window.removeEventListener('opencv-ready', onOpenCVReady);
-        reject(new Error('OpenCV.js loading timeout - this can happen with large files over slow connections'));
-      }, 130000); // 130 second total timeout for large files
-
-      checkOpenCV();
-    });
-  }
-
-  private async loadHaarCascades(): Promise<void> {
-    const cv = (window as any).cv;
-    
-    if (!cv || !cv.CascadeClassifier) {
-      throw new Error('OpenCV.js not properly loaded - CascadeClassifier not available');
-    }
-
+  private async loadFaceAPIModels(): Promise<void> {
     try {
-      console.log('📥 Loading Haar cascade files from Netlify deployment...');
+      console.log('📥 Loading Face-API.js models...');
       
-      // Load face cascade from Netlify
-      console.log('Loading face cascade from Netlify...');
-      const faceResponse = await this.fetchWithRetry('https://quiet-gnome-7a845c.netlify.app/models/haarcascade_frontalface_default.xml');
-      const faceXmlText = await faceResponse.text();
-      console.log(`✅ Face cascade loaded (${faceXmlText.length} characters)`);
+      // Load models from CDN for reliability
+      const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@latest/model';
       
-      // Load smile cascade from Netlify
-      console.log('Loading smile cascade from Netlify...');
-      const smileResponse = await this.fetchWithRetry('https://quiet-gnome-7a845c.netlify.app/models/haarcascade_smile.xml');
-      const smileXmlText = await smileResponse.text();
-      console.log(`✅ Smile cascade loaded (${smileXmlText.length} characters)`);
+      await Promise.all([
+        faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+        faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL)
+      ]);
       
-      // Check if we got actual XML content or placeholder content
-      if (faceXmlText.includes('This file contains the description of some very simple features') ||
-          smileXmlText.includes('This file contains the description of Haar-like features')) {
-        throw new Error('Haar cascade files contain placeholder content. Please ensure actual XML files are uploaded to Netlify.');
-      }
-      
-      // Validate XML content
-      if (!faceXmlText.includes('<opencv_storage>')) {
-        throw new Error('Invalid face cascade XML content - missing opencv_storage tag');
-      }
-      
-      if (!smileXmlText.includes('<opencv_storage>')) {
-        throw new Error('Invalid smile cascade XML content - missing opencv_storage tag');
-      }
-      
-      // Create file names for OpenCV's virtual file system
-      const faceFileName = 'haarcascade_frontalface_default.xml';
-      const smileFileName = 'haarcascade_smile.xml';
-      
-      // Write files to OpenCV's virtual file system
-      cv.FS_createDataFile('/', faceFileName, faceXmlText, true, false, false);
-      cv.FS_createDataFile('/', smileFileName, smileXmlText, true, false, false);
-      
-      console.log('✅ Cascade files written to OpenCV virtual file system');
-      
-      // Create cascade classifiers
-      this.faceCascade = new cv.CascadeClassifier();
-      this.smileCascade = new cv.CascadeClassifier();
-      
-      // Load the classifiers
-      const faceLoaded = this.faceCascade.load(faceFileName);
-      const smileLoaded = this.smileCascade.load(smileFileName);
-      
-      if (!faceLoaded) {
-        throw new Error('Failed to load face cascade classifier - file may be corrupted');
-      }
-      
-      if (!smileLoaded) {
-        throw new Error('Failed to load smile cascade classifier - file may be corrupted');
-      }
-      
-      console.log('🎯 Both Haar cascade classifiers loaded and ready!');
-      console.log('📍 Using Netlify-hosted cascade files for maximum reliability');
+      console.log('✅ All Face-API.js models loaded successfully');
       
     } catch (error) {
-      console.error('❌ Error loading Haar cascades:', error);
+      console.error('❌ Error loading Face-API.js models:', error);
       throw error;
     }
-  }
-
-  private async fetchWithRetry(url: string, maxRetries: number = 5): Promise<Response> {
-    for (let i = 0; i < maxRetries; i++) {
-      try {
-        console.log(`Attempting to fetch ${url} (attempt ${i + 1}/${maxRetries})`);
-        const response = await fetch(url, {
-          mode: 'cors',
-          cache: 'default'
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        return response;
-      } catch (error) {
-        console.warn(`Fetch attempt ${i + 1} failed:`, error);
-        
-        if (i === maxRetries - 1) {
-          throw new Error(`Failed to fetch ${url} after ${maxRetries} attempts: ${error}`);
-        }
-        
-        // Wait before retrying (exponential backoff)
-        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
-      }
-    }
-    
-    throw new Error('Unexpected error in fetchWithRetry');
   }
 
   async detectSmileInFrame(canvas: HTMLCanvasElement, currentTime: number): Promise<{ hasSmile: boolean; confidence: number; faceCount: number; isGenuineSmile: boolean }> {
@@ -192,143 +55,226 @@ export class FaceDetectionService {
       await this.initialize();
     }
 
-    if (this.detectionMethod !== 'opencv' || !this.faceCascade || !this.smileCascade) {
-      throw new Error('OpenCV detection not available - initialization failed');
+    if (this.detectionMethod !== 'faceapi-hybrid' || !this.modelsLoaded) {
+      throw new Error('Face-API.js detection not available - initialization failed');
     }
 
-    return await this.detectWithOpenCV(canvas, currentTime);
+    return await this.detectWithHybridMethod(canvas, currentTime);
   }
 
-  private async detectWithOpenCV(canvas: HTMLCanvasElement, currentTime: number): Promise<{ hasSmile: boolean; confidence: number; faceCount: number; isGenuineSmile: boolean }> {
-    const cv = (window as any).cv;
-    
-    if (!cv || !cv.Mat) {
-      throw new Error('OpenCV.js not available');
-    }
-    
+  private async detectWithHybridMethod(canvas: HTMLCanvasElement, currentTime: number): Promise<{ hasSmile: boolean; confidence: number; faceCount: number; isGenuineSmile: boolean }> {
     try {
-      // Get image data from canvas
-      const ctx = canvas.getContext('2d')!;
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      
-      // Convert to OpenCV Mat
-      const src = cv.matFromImageData(imageData);
-      const gray = new cv.Mat();
-      cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
-      
-      // Detect faces with optimized parameters for real detection
-      const faces = new cv.RectVector();
-      this.faceCascade.detectMultiScale(
-        gray, 
-        faces, 
-        1.1,    // Scale factor
-        3,      // Min neighbors
-        0,      // Flags
-        new cv.Size(30, 30),   // Min size
-        new cv.Size(300, 300)  // Max size
-      );
-      
-      const faceCount = faces.size();
+      // Detect faces with landmarks and expressions
+      const detections = await faceapi
+        .detectAllFaces(canvas, new faceapi.TinyFaceDetectorOptions({
+          inputSize: 416,
+          scoreThreshold: 0.5
+        }))
+        .withFaceLandmarks()
+        .withFaceExpressions();
+
+      const faceCount = detections.length;
       let bestSmileConfidence = 0;
-      let totalSmiles = 0;
-      
-      console.log(`👤 OpenCV detected ${faceCount} faces at ${currentTime.toFixed(1)}s`);
-      
-      // For each detected face, check for smiles
-      for (let i = 0; i < faceCount; i++) {
-        const face = faces.get(i);
-        const faceROI = gray.roi(face);
+      let genuineSmileCount = 0;
+
+      console.log(`👤 Face-API.js detected ${faceCount} faces at ${currentTime.toFixed(1)}s`);
+
+      for (const detection of detections) {
+        const landmarks = detection.landmarks;
+        const expressions = detection.expressions;
         
-        // Detect smiles within the face region
-        const smiles = new cv.RectVector();
-        this.smileCascade.detectMultiScale(
-          faceROI, 
-          smiles, 
-          1.8,    // Scale factor (higher = faster but less sensitive)
-          20,     // Min neighbors (higher = more strict)
-          0,      // Flags
-          new cv.Size(25, 15),   // Min size for smile
-          new cv.Size(120, 80)   // Max size for smile
-        );
+        // Get the "happy" score as a pre-filter
+        const happyScore = expressions.happy;
         
-        const smileCount = smiles.size();
-        
-        if (smileCount > 0) {
-          totalSmiles++;
-          // Calculate confidence based on number of smile detections
-          // More detections = higher confidence, but cap it reasonably
-          const smileConfidence = Math.min(0.95, 0.7 + (smileCount * 0.05));
-          bestSmileConfidence = Math.max(bestSmileConfidence, smileConfidence);
+        // Only analyze geometry if there's some indication of happiness
+        if (happyScore > 0.2) {
+          const geometricAnalysis = this.analyzeSmileGeometry(landmarks);
+          const combinedConfidence = this.calculateCombinedConfidence(happyScore, geometricAnalysis);
           
-          console.log(`😊 REAL SMILE DETECTED! Face ${i + 1}: ${smileCount} smile detection(s), confidence: ${(smileConfidence * 100).toFixed(1)}%`);
+          if (combinedConfidence.isGenuine) {
+            genuineSmileCount++;
+            bestSmileConfidence = Math.max(bestSmileConfidence, combinedConfidence.confidence);
+            
+            console.log(`😊 GENUINE SMILE DETECTED! Happy: ${(happyScore * 100).toFixed(1)}%, Geometric: ${(geometricAnalysis.confidence * 100).toFixed(1)}%, Combined: ${(combinedConfidence.confidence * 100).toFixed(1)}%`);
+          }
         }
-        
-        // Cleanup
-        faceROI.delete();
-        smiles.delete();
       }
-      
-      // Cleanup OpenCV objects
-      src.delete();
-      gray.delete();
-      faces.delete();
-      
-      const hasSmile = totalSmiles > 0;
-      const isGenuineSmile = bestSmileConfidence > 0.75;
-      
+
+      const hasSmile = genuineSmileCount > 0;
+      const isGenuineSmile = bestSmileConfidence > 0.7;
+
       if (hasSmile) {
-        console.log(`🎯 GENUINE OpenCV DETECTION: ${totalSmiles} smile(s) found! Best confidence: ${(bestSmileConfidence * 100).toFixed(1)}% at ${currentTime.toFixed(1)}s`);
+        console.log(`🎯 HYBRID DETECTION: ${genuineSmileCount} genuine smile(s)! Best confidence: ${(bestSmileConfidence * 100).toFixed(1)}% at ${currentTime.toFixed(1)}s`);
       }
-      
+
       return {
         hasSmile,
         confidence: bestSmileConfidence,
         faceCount,
         isGenuineSmile
       };
-      
+
     } catch (error) {
-      console.error('❌ OpenCV detection error:', error);
+      console.error('❌ Face-API.js detection error:', error);
       throw error;
     }
   }
 
+  private analyzeSmileGeometry(landmarks: faceapi.FaceLandmarks68): { confidence: number; features: any } {
+    const points = landmarks.positions;
+    
+    // Key landmark indices for smile analysis
+    const leftMouthCorner = points[48];   // Left corner of mouth
+    const rightMouthCorner = points[54];  // Right corner of mouth
+    const topLip = points[51];            // Top of upper lip
+    const bottomLip = points[57];         // Bottom of lower lip
+    const leftEyeOuter = points[36];      // Left eye outer corner
+    const rightEyeOuter = points[45];     // Right eye outer corner
+    const leftEyebrowInner = points[21];  // Left eyebrow inner
+    const rightEyebrowInner = points[22]; // Right eyebrow inner
+    const noseTip = points[33];           // Nose tip
+    
+    // 1. Mouth Width Analysis
+    const mouthWidth = this.calculateDistance(leftMouthCorner, rightMouthCorner);
+    const faceWidth = this.calculateDistance(leftEyeOuter, rightEyeOuter);
+    const mouthWidthRatio = mouthWidth / faceWidth;
+    
+    // 2. Mouth Curvature Analysis
+    const mouthCurvature = this.calculateMouthCurvature(leftMouthCorner, rightMouthCorner, topLip, bottomLip);
+    
+    // 3. Eye Crinkle Analysis (Duchenne smile indicator)
+    const leftEyeCrinkle = this.calculateEyeCrinkle(leftEyeOuter, leftEyebrowInner);
+    const rightEyeCrinkle = this.calculateEyeCrinkle(rightEyeOuter, rightEyebrowInner);
+    const avgEyeCrinkle = (leftEyeCrinkle + rightEyeCrinkle) / 2;
+    
+    // 4. Mouth Openness
+    const mouthOpenness = this.calculateDistance(topLip, bottomLip);
+    const mouthOpennessRatio = mouthOpenness / mouthWidth;
+    
+    // 5. Symmetry Analysis
+    const symmetryScore = this.calculateSmileSymmetry(leftMouthCorner, rightMouthCorner, noseTip);
+    
+    // Scoring thresholds based on research and testing
+    const features = {
+      mouthWidthRatio,
+      mouthCurvature,
+      avgEyeCrinkle,
+      mouthOpennessRatio,
+      symmetryScore
+    };
+    
+    // Calculate geometric confidence
+    let geometricScore = 0;
+    
+    // Mouth width contribution (30%)
+    if (mouthWidthRatio > 0.35) geometricScore += 0.3;
+    else if (mouthWidthRatio > 0.3) geometricScore += 0.2;
+    else if (mouthWidthRatio > 0.25) geometricScore += 0.1;
+    
+    // Mouth curvature contribution (25%)
+    if (mouthCurvature > 0.7) geometricScore += 0.25;
+    else if (mouthCurvature > 0.5) geometricScore += 0.15;
+    else if (mouthCurvature > 0.3) geometricScore += 0.1;
+    
+    // Eye crinkle contribution (25%) - Duchenne smile
+    if (avgEyeCrinkle > 0.6) geometricScore += 0.25;
+    else if (avgEyeCrinkle > 0.4) geometricScore += 0.15;
+    else if (avgEyeCrinkle > 0.2) geometricScore += 0.1;
+    
+    // Symmetry contribution (20%)
+    if (symmetryScore > 0.8) geometricScore += 0.2;
+    else if (symmetryScore > 0.6) geometricScore += 0.15;
+    else if (symmetryScore > 0.4) geometricScore += 0.1;
+    
+    return {
+      confidence: Math.min(1.0, geometricScore),
+      features
+    };
+  }
+
+  private calculateDistance(point1: faceapi.Point, point2: faceapi.Point): number {
+    const dx = point1.x - point2.x;
+    const dy = point1.y - point2.y;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  private calculateMouthCurvature(leftCorner: faceapi.Point, rightCorner: faceapi.Point, topLip: faceapi.Point, bottomLip: faceapi.Point): number {
+    // Calculate if mouth corners are higher than the center
+    const mouthCenterY = (topLip.y + bottomLip.y) / 2;
+    const avgCornerY = (leftCorner.y + rightCorner.y) / 2;
+    
+    // Positive curvature means corners are higher (smile)
+    const curvature = (mouthCenterY - avgCornerY) / this.calculateDistance(leftCorner, rightCorner);
+    
+    // Normalize to 0-1 range
+    return Math.max(0, Math.min(1, curvature * 10 + 0.5));
+  }
+
+  private calculateEyeCrinkle(eyeCorner: faceapi.Point, eyebrow: faceapi.Point): number {
+    // Distance between eye corner and eyebrow (smaller = more crinkle)
+    const distance = this.calculateDistance(eyeCorner, eyebrow);
+    
+    // Normalize based on typical face proportions
+    // This is a simplified approach - in practice you'd calibrate this
+    const normalizedDistance = distance / 50; // Adjust based on testing
+    
+    // Invert so smaller distance = higher crinkle score
+    return Math.max(0, Math.min(1, 1 - normalizedDistance));
+  }
+
+  private calculateSmileSymmetry(leftCorner: faceapi.Point, rightCorner: faceapi.Point, noseTip: faceapi.Point): number {
+    // Calculate if smile is symmetric relative to nose
+    const leftDistance = this.calculateDistance(leftCorner, noseTip);
+    const rightDistance = this.calculateDistance(rightCorner, noseTip);
+    
+    const symmetryRatio = Math.min(leftDistance, rightDistance) / Math.max(leftDistance, rightDistance);
+    
+    return symmetryRatio;
+  }
+
+  private calculateCombinedConfidence(happyScore: number, geometricAnalysis: { confidence: number; features: any }): { confidence: number; isGenuine: boolean } {
+    // Weighted combination of ML and geometric analysis
+    const mlWeight = 0.4;
+    const geometricWeight = 0.6;
+    
+    const combinedScore = (happyScore * mlWeight) + (geometricAnalysis.confidence * geometricWeight);
+    
+    // Additional bonus for strong geometric features
+    let bonus = 0;
+    if (geometricAnalysis.features.avgEyeCrinkle > 0.5) bonus += 0.1; // Duchenne smile bonus
+    if (geometricAnalysis.features.symmetryScore > 0.8) bonus += 0.05; // Symmetry bonus
+    
+    const finalConfidence = Math.min(1.0, combinedScore + bonus);
+    
+    // Thresholds for genuine smile
+    const isGenuine = finalConfidence > 0.65 && 
+                     geometricAnalysis.confidence > 0.4 && 
+                     happyScore > 0.25;
+    
+    return {
+      confidence: finalConfidence,
+      isGenuine
+    };
+  }
+
   isUsingRealDetection(): boolean {
-    return this.detectionMethod === 'opencv' && this.initialized;
+    return this.detectionMethod === 'faceapi-hybrid' && this.initialized;
   }
 
   getDetectionMethod(): string {
-    if (this.detectionMethod === 'opencv') {
-      return 'Real OpenCV Haar Cascades (Netlify CDN)';
+    if (this.detectionMethod === 'faceapi-hybrid') {
+      return 'Face-API.js + Geometric Analysis (Hybrid ML + CV)';
     } else {
-      return 'Detection Failed - OpenCV Not Available';
+      return 'Detection Failed - Face-API.js Not Available';
     }
   }
 
   clearHistory(): void {
-    // No history to clear for real OpenCV detection
+    // No history to clear for Face-API.js detection
   }
 
   cleanup(): void {
     this.clearHistory();
-    
-    // Cleanup OpenCV classifiers
-    if (this.faceCascade) {
-      try {
-        this.faceCascade.delete();
-      } catch (e) {
-        console.warn('Error deleting face cascade:', e);
-      }
-      this.faceCascade = null;
-    }
-    if (this.smileCascade) {
-      try {
-        this.smileCascade.delete();
-      } catch (e) {
-        console.warn('Error deleting smile cascade:', e);
-      }
-      this.smileCascade = null;
-    }
   }
 }
 
