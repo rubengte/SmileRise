@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<opencv_storage>
+<haarcascade_smile type_id="opencv-haar-classifier">
+  <size>20 20</size>
+  <stages>
+    <_>
+      <trees>
+        <_>
+          <_>
+            <feature>
+              <rects>
+                <_>5 4 10 9 -1.</_>
+                <_>5 7 10 3 3.</_>
+              </rects>
+              <tilted>0</tilted>
+            </feature>
+            <threshold>-0.0533980093896389</threshold>
+            <left_val>0.6037735939025879</left_val>
+            <right_val>-0.5925925970077515</right_val>
+          </_>
+        </_>
+      </trees>
+      <stage_threshold>-0.5925925970077515</stage_threshold>
+      <parent>-1</parent>
+      <next>-1</next>
+    </_>
+    <_>
+      <trees>
+        <_>
+          <_>
+            <feature>
+              <rects>
+                <_>7 15 6 4 -1.</_>
+                <_>7 17 6 2 2.</_>
+              </rects>
+              <tilted>0</tilted>
+            </feature>
+            <threshold>-0.0118312500417233</threshold>
+            <left_val>0.6000000238418579</left_val>
+            <right_val>-0.6666666865348816</right_val>
+          </_>
+        </_>
+      </trees>
+      <stage_threshold>-0.6666666865348816</stage_threshold>
+      <parent>0</parent>
+      <next>-1</next>
+    </_>
+    <_>
+      <trees>
+        <_>
+          <_>
+            <feature>
+              <rects>
+                <_>3 7 3 6 -1.</_>
+                <_>3 9 3 2 3.</_>
+              </rects>
+              <tilted>0</tilted>
+            </feature>
+            <threshold>-0.0166666675359011</threshold>
+            <left_val>0.4285714328289032</left_val>
+            <right_val>-0.7500000000000000</right_val>
+          </_>
+        </_>
+        <_>
+          <_>
+            <feature>
+              <rects>
+                <_>14 7 3 6 -1.</_>
+                <_>14 9 3 2 3.</_>
+              </rects>
+              <tilted>0</tilted>
+            </feature>
+            <threshold>-0.0166666675359011</threshold>
+            <left_val>0.4285714328289032</left_val>
+            <right_val>-0.7500000000000000</right_val>
+          </_>
+        </_>
+      </trees>
+      <stage_threshold>-1.2142857313156128</stage_threshold>
+      <parent>1</parent>
+      <next>-1</next>
+    </_>
+  </stages>
+  <features>
+    <_>5 4 10 9 -1.</_>
+    <_>5 7 10 3 3.</_>
+    <_>7 15 6 4 -1.</_>
+    <_>7 17 6 2 2.</_>
+    <_>3 7 3 6 -1.</_>
+    <_>3 9 3 2 3.</_>
+    <_>14 7 3 6 -1.</_>
+    <_>14 9 3 2 3.</_>
+  </features>
+</haarcascade_smile>
+</opencv_storage>
