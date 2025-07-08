@@ -228,9 +228,9 @@ function App() {
 
         {/* Info Footer */}
         <div className="mt-12 text-center text-gray-500 text-sm">
-          <p>This app processes videos client-side using real OpenCV.js computer vision. No data is sent to external servers.</p>
-          <p className="mt-1">Supports high-quality GoPro videos up to 10GB and 30+ minutes. Uses genuine Haar cascade classifiers for accurate detection.</p>
-          <p className="mt-1">OpenCV files hosted on Netlify CDN for reliable global access.</p>
+          <p>This app processes videos client-side using computer vision. No data is sent to external servers.</p>
+          <p className="mt-1">Supports high-quality videos up to 10GB and 30+ minutes. Uses ML and computer vision technology for accurate detection.</p>
+          <p className="mt-1">App open source files hosted on GitHub</p>
         </div>
       </div>
     </div>
