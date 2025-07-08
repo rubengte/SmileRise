@@ -1,24 +1,31 @@
 import React from 'react';
 import { Download, DownloadCloud, Clock, Zap, Star } from 'lucide-react';
 import { ExtractedFrame } from '../types';
-import { downloadFrame, downloadAllFrames } from '../utils/downloadUtils';
+// Assuming downloadAllFrames is still used for the ZIP download,
+// but downloadFrame is now handled by onSaveFrame from App.tsx
+import { downloadAllFrames } from '../utils/downloadUtils'; 
 
 interface ResultsGridProps {
   frames: ExtractedFrame[];
+  // Added the onSaveFrame prop, which is the saveFrame function from App.tsx
+  onSaveFrame: (frame: ExtractedFrame) => void; 
 }
 
-const ResultsGrid: React.FC<ResultsGridProps> = ({ frames }) => {
+const ResultsGrid: React.FC<ResultsGridProps> = ({ frames, onSaveFrame }) => {
   if (frames.length === 0) {
-    return null;
+    return null; // Don't render if no frames
   }
 
   const handleDownloadAll = async () => {
+    // For download all, you might still use a utility function.
+    // If downloadAllFrames also needs video/canvas refs for full res,
+    // you'd need to pass them down or modify downloadAllFrames.
+    // For now, assuming it works with just dataUrls or handles its own canvas.
     await downloadAllFrames(frames);
   };
 
-  const handleDownloadFrame = async (frame: ExtractedFrame) => {
-    await downloadFrame(frame);
-  };
+  // Removed handleDownloadFrame as it's now replaced by the onSaveFrame prop
+
 
   const formatTimestamp = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -82,7 +89,8 @@ const ResultsGrid: React.FC<ResultsGridProps> = ({ frames }) => {
             
             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center">
               <button
-                onClick={() => handleDownloadFrame(frame)}
+                // *** IMPORTANT CHANGE: Call the onSaveFrame prop directly ***
+                onClick={() => onSaveFrame(frame)} 
                 className="opacity-0 group-hover:opacity-100 transition-opacity bg-white text-gray-800 px-3 py-2 rounded-lg shadow-lg hover:bg-gray-50 transform hover:scale-105"
               >
                 <Download className="w-4 h-4 mr-1 inline" />
@@ -143,3 +151,4 @@ const ResultsGrid: React.FC<ResultsGridProps> = ({ frames }) => {
 };
 
 export default ResultsGrid;
+
