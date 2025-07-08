@@ -135,7 +135,7 @@ export class FaceDetectionService {
     const noseTip = points[33];           // Nose tip
     
     // 1. Mouth Width Analysis
-    const mouthWidth = this.calculateDistance(leftMouthCorner, rightMouthCorner);
+    const mouthWidth = Math.abs(rightMouthCorner.x - leftMouthCorner.x);
     const faceWidth = this.calculateDistance(leftEyeOuter, rightEyeOuter);
     const mouthWidthRatio = mouthWidth / faceWidth;
     
@@ -166,10 +166,10 @@ export class FaceDetectionService {
     // Calculate geometric confidence
     let geometricScore = 0;
     
-    // Mouth width contribution (30%)
-    if (mouthWidthRatio > 0.35) geometricScore += 0.3;
-    else if (mouthWidthRatio > 0.3) geometricScore += 0.2;
-    else if (mouthWidthRatio > 0.25) geometricScore += 0.1;
+    // Mouth width contribution (30%) - FIXED: More sensitive thresholds
+    if (mouthWidthRatio > 0.25) geometricScore += 0.3;
+    else if (mouthWidthRatio > 0.2) geometricScore += 0.25;
+    else if (mouthWidthRatio > 0.15) geometricScore += 0.15;
     
     // Mouth curvature contribution (25%)
     if (mouthCurvature > 0.7) geometricScore += 0.25;
@@ -243,13 +243,14 @@ export class FaceDetectionService {
     let bonus = 0;
     if (geometricAnalysis.features.avgEyeCrinkle > 0.5) bonus += 0.1; // Duchenne smile bonus
     if (geometricAnalysis.features.symmetryScore > 0.8) bonus += 0.05; // Symmetry bonus
+    if (geometricAnalysis.features.mouthWidthRatio > 0.3) bonus += 0.05; // Wide smile bonus
     
     const finalConfidence = Math.min(1.0, combinedScore + bonus);
     
-    // Thresholds for genuine smile
-    const isGenuine = finalConfidence > 0.65 && 
-                     geometricAnalysis.confidence > 0.4 && 
-                     happyScore > 0.25;
+    // FIXED: More sensitive thresholds to catch beautiful smiles
+    const isGenuine = finalConfidence > 0.55 && 
+                     geometricAnalysis.confidence > 0.3 && 
+                     happyScore > 0.2;
     
     return {
       confidence: finalConfidence,
