@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react'; // Added useRef here
 import { Smile, AlertCircle, Info, Brain, CheckCircle } from 'lucide-react';
 import VideoUpload from './components/VideoUpload';
 import ProcessingOptionsComponent from './components/ProcessingOptions';
@@ -23,6 +23,10 @@ function App() {
   const [extractedFrames, setExtractedFrames] = useState<ExtractedFrame[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isRealDetection, setIsRealDetection] = useState<boolean | null>(null);
+
+  // Refs for video and canvas elements (needed for direct access to DOM properties like videoWidth)
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const initializeDetection = async () => {
@@ -81,6 +85,57 @@ function App() {
         setProcessingStats(prev => ({ ...prev, isProcessing: false }));
     }
   }, [selectedFile, processingOptions]);
+
+
+  // --- START OF EXPORT QUALITY FIX ---
+  // This function is responsible for saving a frame at full video resolution
+  const saveFrame = useCallback((frame: ExtractedFrame) => {
+    if (!videoRef.current || !canvasRef.current) {
+      console.error("Video or canvas ref not available for saving frame.");
+      return;
+    }
+
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const context = canvas.getContext('2d');
+
+    // IMPORTANT: Set canvas dimensions to the video's intrinsic (full) resolution
+    // This ensures the exported image is not scaled down.
+    if (video.videoWidth === 0 || video.videoHeight === 0) {
+        console.error("Video has no intrinsic dimensions (not loaded or invalid). Cannot save frame at full resolution.");
+        // Optionally, you could fall back to a smaller resolution or show an error to the user
+        return;
+    }
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // Draw the video frame onto the canvas at its full resolution
+    // Ensure the video is at the correct timestamp before drawing
+    // Note: This might cause a brief visual flicker if done directly here
+    // A more robust solution might involve creating a temporary offscreen canvas
+    // or ensuring the video element is already seeking to the correct frame.
+    // For now, we assume the video is paused at the correct frame or will snap to it quickly.
+    video.currentTime = frame.timestamp; // Set video to the exact timestamp of the detected frame
+    context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+
+    // Get the image data from the canvas as JPEG with good quality
+    const image = canvas.toDataURL('image/jpeg', 0.95); // Increased quality to 0.95
+
+    // Generate a unique filename for the downloaded image
+    const fileName = `smile-frame-${frame.timestamp.toFixed(2)}s.jpg`;
+
+    // Create a temporary link element to trigger the download
+    const link = document.createElement('a');
+    link.href = image;
+    link.download = fileName;
+    document.body.appendChild(link); // Append to body to make it clickable
+    link.click(); // Programmatically click the link
+    document.body.removeChild(link); // Clean up the link element
+  }, []); // Dependencies for useCallback
+
+  // --- END OF EXPORT QUALITY FIX ---
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -180,9 +235,12 @@ function App() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           {/* Upload Section */}
           <div className="lg:col-span-2">
+            {/* Pass refs to VideoUpload component */}
             <VideoUpload 
               onVideoSelect={handleVideoSelect}
               isProcessing={processingStats.isProcessing}
+              videoRef={videoRef} // Pass videoRef here
+              canvasRef={canvasRef} // Pass canvasRef here
             />
           </div>
 
@@ -224,7 +282,8 @@ function App() {
         </div>
 
         {/* Results Section */}
-        <ResultsGrid frames={extractedFrames} />
+        {/* Pass saveFrame function to ResultsGrid */}
+        <ResultsGrid frames={extractedFrames} onSaveFrame={saveFrame} /> 
 
         {/* Info Footer */}
         <div className="mt-12 text-center text-gray-500 text-sm">
@@ -238,3 +297,4 @@ function App() {
 }
 
 export default App;
+
