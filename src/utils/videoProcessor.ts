@@ -16,9 +16,9 @@ export class VideoProcessor {
   constructor() {
     this.video = document.createElement('video');
     this.canvas = document.createElement('canvas');
-    this.fullResCanvas = document.createElement('canvas'); // New: Full resolution canvas
+    this.fullResCanvas = document.createElement('canvas'); // Full resolution canvas for export
     this.ctx = this.canvas.getContext('2d')!;
-    this.fullResCtx = this.fullResCanvas.getContext('2d')!; // New: Full resolution context
+    this.fullResCtx = this.fullResCanvas.getContext('2d')!; // Full resolution context
     
     this.video.muted = true;
     this.video.playsInline = true;
@@ -106,6 +106,12 @@ export class VideoProcessor {
 
           console.log(`📐 Canvas size: ${this.canvas.width}x${this.canvas.height} (from ${this.video.videoWidth}x${this.video.videoHeight})`);
 
+          // Set FULL RESOLUTION canvas for export (this is the key fix!)
+          this.fullResCanvas.width = this.video.videoWidth;
+          this.fullResCanvas.height = this.video.videoHeight;
+          
+          console.log(`🎯 EXPORT canvas size: ${this.fullResCanvas.width}x${this.fullResCanvas.height} (FULL RESOLUTION)`);
+
           // Initialize face detection
           await faceDetectionService.initialize();
 
@@ -152,13 +158,13 @@ export class VideoProcessor {
                   const isDiverse = this.checkFrameDiversity(currentTime, extractedFrames);
                   
                   if (isDiverse) {
-                    // Capture frame at FULL RESOLUTION for export
+                    // Capture frame at FULL RESOLUTION for export (FIXED!)
                     this.fullResCtx.clearRect(0, 0, this.fullResCanvas.width, this.fullResCanvas.height);
                     this.fullResCtx.drawImage(this.video, 0, 0, this.fullResCanvas.width, this.fullResCanvas.height);
                     
                     const frameData: ExtractedFrame = {
                       id: `frame-${Date.now()}-${Math.random()}`,
-                      dataUrl: this.fullResCanvas.toDataURL('image/jpeg', 0.95), // FULL RESOLUTION export
+                      dataUrl: this.fullResCanvas.toDataURL('image/jpeg', 0.98), // MAXIMUM QUALITY export
                       timestamp: currentTime,
                       confidence: detection.confidence
                     };
@@ -179,7 +185,7 @@ export class VideoProcessor {
                       extractedFrames.splice(options.maxExtract);
                     }
                     
-                    console.log(`🎯 Added genuine smile at FULL RES (${this.fullResCanvas.width}x${this.fullResCanvas.height})! Total: ${extractedFrames.length}, Confidence: ${(detection.confidence * 100).toFixed(1)}%`);
+                    console.log(`🎯 MAXIMUM QUALITY EXPORT (${this.fullResCanvas.width}x${this.fullResCanvas.height})! Total: ${extractedFrames.length}, Confidence: ${(detection.confidence * 100).toFixed(1)}%`);
                   }
                 }
               } catch (detectionError) {
@@ -247,7 +253,7 @@ export class VideoProcessor {
 
   private checkFrameDiversity(currentTime: number, existingFrames: ExtractedFrame[]): boolean {
     // Ensure minimum time gap between frames
-    const minTimeGap = 2.0; // 2 seconds minimum
+    const minTimeGap = 1.5; // Reduced to 1.5 seconds to catch more amazing smiles
     
     for (const frame of existingFrames) {
       if (Math.abs(currentTime - frame.timestamp) < minTimeGap) {
@@ -259,7 +265,7 @@ export class VideoProcessor {
   }
 
   private addToCluster(frame: ExtractedFrame): void {
-    const clusterThreshold = 5.0; // 5 seconds to be in same cluster
+    const clusterThreshold = 4.0; // Reduced to 4 seconds for better diversity
     
     // Find existing cluster for this frame
     let targetCluster = this.smileClusters.find(cluster => 

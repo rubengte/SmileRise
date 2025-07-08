@@ -86,8 +86,8 @@ export class FaceDetectionService {
         // Get the "happy" score as a pre-filter
         const happyScore = expressions.happy;
         
-        // Only analyze geometry if there's some indication of happiness
-        if (happyScore > 0.2) {
+        // ULTRA SENSITIVE: Analyze geometry even for subtle happiness indicators
+        if (happyScore > 0.08) {
           const geometricAnalysis = this.analyzeSmileGeometry(landmarks);
           const combinedConfidence = this.calculateCombinedConfidence(happyScore, geometricAnalysis);
           
@@ -95,16 +95,16 @@ export class FaceDetectionService {
             genuineSmileCount++;
             bestSmileConfidence = Math.max(bestSmileConfidence, combinedConfidence.confidence);
             
-            console.log(`😊 GENUINE SMILE DETECTED! Happy: ${(happyScore * 100).toFixed(1)}%, Geometric: ${(geometricAnalysis.confidence * 100).toFixed(1)}%, Combined: ${(combinedConfidence.confidence * 100).toFixed(1)}%`);
+            console.log(`😊 AMAZING SMILE DETECTED! Happy: ${(happyScore * 100).toFixed(1)}%, Geometric: ${(geometricAnalysis.confidence * 100).toFixed(1)}%, Combined: ${(combinedConfidence.confidence * 100).toFixed(1)}%`);
           }
         }
       }
 
       const hasSmile = genuineSmileCount > 0;
-      const isGenuineSmile = bestSmileConfidence > 0.7;
+      const isGenuineSmile = bestSmileConfidence > 0.5; // More sensitive threshold
 
       if (hasSmile) {
-        console.log(`🎯 HYBRID DETECTION: ${genuineSmileCount} genuine smile(s)! Best confidence: ${(bestSmileConfidence * 100).toFixed(1)}% at ${currentTime.toFixed(1)}s`);
+        console.log(`🎯 ULTRA SENSITIVE DETECTION: ${genuineSmileCount} amazing smile(s)! Best confidence: ${(bestSmileConfidence * 100).toFixed(1)}% at ${currentTime.toFixed(1)}s`);
       }
 
       return {
