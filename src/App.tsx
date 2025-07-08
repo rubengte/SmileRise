@@ -150,6 +150,22 @@ function App() {
           </div>
         </div>
 
+        {/* Processing Tips Banner */}
+        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start">
+          <Info className="w-5 h-5 text-amber-600 mr-2 flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-amber-800">
+            <strong>💡 Processing Tips for Best Results:</strong>
+            <ul className="mt-2 space-y-1 list-disc list-inside">
+              <li><strong>Keep this browser tab active</strong> during processing (don't switch tabs or minimize)</li>
+              <li><strong>On mobile:</strong> Keep your screen on and this app in the foreground</li>
+              <li><strong>For long videos (30+ min):</strong> Consider plugging in your device to prevent sleep mode</li>
+              <li><strong>Processing runs locally</strong> - your video never leaves your device for privacy</li>
+            </ul>
+            <p className="mt-2 text-xs text-amber-700">
+              Browser background throttling can slow down or pause video processing. Staying active ensures optimal performance!
+            </p>
+          </div>
+        </div>
         {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start">
