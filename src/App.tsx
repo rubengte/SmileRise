@@ -116,14 +116,14 @@ function App() {
             <div className={`text-sm ${isRealDetection ? 'text-green-800' : 'text-red-800'}`}>
               <strong>
                 {isRealDetection 
-                  ? '🎯 REAL OpenCV Haar Cascade Detection ACTIVE!' 
-                  : '❌ OpenCV Detection Failed!'
+                  ? '🎯 Advanced Face-API.js + Geometric Analysis ACTIVE!' 
+                  : '❌ Face-API.js Detection Failed!'
                 }
               </strong>
               <p className="mt-1">
                 {isRealDetection 
-                  ? 'Using genuine OpenCV.js computer vision with Haar cascade classifiers for precise face and smile detection. This is real computer vision technology - the same used in professional applications and research!'
-                  : 'Failed to load OpenCV.js or Haar cascade files. The files may be loading from Netlify - please wait a moment and refresh if needed.'
+                  ? 'Using advanced Face-API.js machine learning models combined with geometric facial analysis for precise smile detection. This hybrid approach analyzes facial landmarks, expressions, and geometric features for superior accuracy!'
+                  : 'Failed to load Face-API.js models. The models may be loading from CDN - please wait a moment and refresh if needed.'
                 }
               </p>
               <p className="mt-1 text-xs opacity-75">
@@ -131,7 +131,7 @@ function App() {
               </p>
               {isRealDetection && (
                 <p className="mt-1 text-xs opacity-75">
-                  Using Netlify-hosted Haar cascade files for reliable access
+                  Using CDN-hosted Face-API.js models for reliable global access
                 </p>
               )}
             </div>
@@ -142,18 +142,18 @@ function App() {
         <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start">
           <Info className="w-5 h-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-blue-800">
-            <strong>Real Computer Vision Technology:</strong> This app uses genuine OpenCV.js with Haar cascade classifiers 
-            to detect faces and smiles. The system analyzes facial features using the same algorithms used in professional 
-            computer vision applications. Results are based on actual geometric feature detection, not simulation or guesswork.
+            <strong>Advanced ML + Computer Vision Technology:</strong> This app uses Face-API.js machine learning models 
+            combined with geometric facial analysis to detect genuine smiles. The hybrid system analyzes facial landmarks, 
+            expressions, and geometric features for superior accuracy compared to single-method approaches.
             <br />
-            <strong>Note:</strong> OpenCV files are loaded from Netlify CDN for reliability. Initial loading may take 30-60 seconds for large files.
+            <strong>Note:</strong> Face-API.js models are loaded from CDN for reliability. Initial loading may take 30-60 seconds for large files.
           </div>
         </div>
 
         {/* Processing Tips Banner */}
-        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start">
-          <Info className="w-5 h-5 text-amber-600 mr-2 flex-shrink-0 mt-0.5" />
-          <div className="text-sm text-amber-800">
+        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start">
+          <Info className="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
+          <div className="text-sm text-green-800">
             <strong>💡 Processing Tips for Best Results:</strong>
             <ul className="mt-2 space-y-1 list-disc list-inside">
               <li><strong>Keep this browser tab active</strong> during processing (don't switch tabs or minimize)</li>
@@ -161,7 +161,7 @@ function App() {
               <li><strong>For long videos (30+ min):</strong> Consider plugging in your device to prevent sleep mode</li>
               <li><strong>Processing runs locally</strong> - your video never leaves your device for privacy</li>
             </ul>
-            <p className="mt-2 text-xs text-amber-700">
+            <p className="mt-2 text-xs text-green-700">
               Browser background throttling can slow down or pause video processing. Staying active ensures optimal performance!
             </p>
           </div>

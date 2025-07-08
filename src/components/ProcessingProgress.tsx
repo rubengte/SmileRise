@@ -60,12 +60,12 @@ const ProcessingProgress: React.FC<ProcessingProgressProps> = ({ stats }) => {
         </div>
         
         {stats.isProcessing && (
-          <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <div className="flex items-center text-sm text-yellow-800">
+          <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center text-sm text-green-800">
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               <span className="font-medium">Keep this tab active for optimal processing speed</span>
             </div>
-            <p className="text-xs text-yellow-700 mt-1">
+            <p className="text-xs text-green-700 mt-1">
               Browser may throttle background tabs, slowing down video analysis
             </p>
           </div>
