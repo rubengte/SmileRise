@@ -146,7 +146,7 @@ function App() {
             combined with geometric facial analysis to detect genuine smiles. The hybrid system analyzes facial landmarks, 
             expressions, and geometric features for superior accuracy compared to single-method approaches.
             <br />
-            <strong>Note:</strong> Face-API.js models are loaded from CDN for reliability. Initial loading may take 30-60 seconds for large files.
+            <strong>Note:</strong> Enjoy.
           </div>
         </div>
 
