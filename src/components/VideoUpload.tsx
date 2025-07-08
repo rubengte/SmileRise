@@ -1,12 +1,15 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, ChangeEvent } from 'react'; // Added ChangeEvent
 import { Upload, Video } from 'lucide-react';
 
+// Define props interface for VideoUpload, including the refs
 interface VideoUploadProps {
   onVideoSelect: (file: File) => void;
   isProcessing: boolean;
+  videoRef: React.RefObject<HTMLVideoElement>; // Added videoRef prop
+  canvasRef: React.RefObject<HTMLCanvasElement>; // Added canvasRef prop
 }
 
-const VideoUpload: React.FC<VideoUploadProps> = ({ onVideoSelect, isProcessing }) => {
+const VideoUpload: React.FC<VideoUploadProps> = ({ onVideoSelect, isProcessing, videoRef, canvasRef }) => {
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     const files = Array.from(e.dataTransfer.files);
@@ -70,8 +73,16 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ onVideoSelect, isProcessing }
           </label>
         </div>
       </div>
+
+      {/* --- IMPORTANT: ADDED VIDEO AND CANVAS ELEMENTS WITH REFS --- */}
+      {/* These elements are crucial for video processing and frame extraction. */}
+      {/* They are hidden as they are used for background operations, not direct display here. */}
+      <video ref={videoRef} controls className="mt-4 w-full rounded-lg shadow-md" style={{ display: 'none' }}></video>
+      <canvas ref={canvasRef} className="mt-4 w-full rounded-lg shadow-md" style={{ display: 'none' }}></canvas>
+      {/* --- END IMPORTANT ADDITION --- */}
     </div>
   );
 };
 
 export default VideoUpload;
+
