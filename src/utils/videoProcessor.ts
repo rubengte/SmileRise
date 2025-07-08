@@ -4,7 +4,9 @@ import { faceDetectionService } from './faceDetection';
 export class VideoProcessor {
   private video: HTMLVideoElement;
   private canvas: HTMLCanvasElement;
+  private fullResCanvas: HTMLCanvasElement; // New: Full resolution canvas for export
   private ctx: CanvasRenderingContext2D;
+  private fullResCtx: CanvasRenderingContext2D; // New: Full resolution context
   private lastDetectionTime: number = 0;
   private detectionCooldown: number = 3000; // Increased to 3 seconds for better diversity
   private isProcessing: boolean = false;
@@ -14,7 +16,9 @@ export class VideoProcessor {
   constructor() {
     this.video = document.createElement('video');
     this.canvas = document.createElement('canvas');
+    this.fullResCanvas = document.createElement('canvas'); // New: Full resolution canvas
     this.ctx = this.canvas.getContext('2d')!;
+    this.fullResCtx = this.fullResCanvas.getContext('2d')!; // New: Full resolution context
     
     this.video.muted = true;
     this.video.playsInline = true;
@@ -133,7 +137,7 @@ export class VideoProcessor {
 
               if (this.shouldStop) return;
 
-              // Clear canvas and draw frame
+              // Clear detection canvas and draw frame for analysis
               this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
               this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
               
@@ -148,9 +152,13 @@ export class VideoProcessor {
                   const isDiverse = this.checkFrameDiversity(currentTime, extractedFrames);
                   
                   if (isDiverse) {
+                    // Capture frame at FULL RESOLUTION for export
+                    this.fullResCtx.clearRect(0, 0, this.fullResCanvas.width, this.fullResCanvas.height);
+                    this.fullResCtx.drawImage(this.video, 0, 0, this.fullResCanvas.width, this.fullResCanvas.height);
+                    
                     const frameData: ExtractedFrame = {
                       id: `frame-${Date.now()}-${Math.random()}`,
-                      dataUrl: this.canvas.toDataURL('image/jpeg', 0.95), // Higher quality for high-res videos
+                      dataUrl: this.fullResCanvas.toDataURL('image/jpeg', 0.95), // FULL RESOLUTION export
                       timestamp: currentTime,
                       confidence: detection.confidence
                     };
@@ -171,7 +179,7 @@ export class VideoProcessor {
                       extractedFrames.splice(options.maxExtract);
                     }
                     
-                    console.log(`🎯 Added genuine smile! Total: ${extractedFrames.length}, Confidence: ${(detection.confidence * 100).toFixed(1)}%`);
+                    console.log(`🎯 Added genuine smile at FULL RES (${this.fullResCanvas.width}x${this.fullResCanvas.height})! Total: ${extractedFrames.length}, Confidence: ${(detection.confidence * 100).toFixed(1)}%`);
                   }
                 }
               } catch (detectionError) {
@@ -304,6 +312,7 @@ export class VideoProcessor {
       this.video.src = '';
     }
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.fullResCtx.clearRect(0, 0, this.fullResCanvas.width, this.fullResCanvas.height); // Clear full res canvas
     this.smileClusters = [];
     faceDetectionService.clearHistory();
   }

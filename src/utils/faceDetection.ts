@@ -244,13 +244,14 @@ export class FaceDetectionService {
     if (geometricAnalysis.features.avgEyeCrinkle > 0.5) bonus += 0.1; // Duchenne smile bonus
     if (geometricAnalysis.features.symmetryScore > 0.8) bonus += 0.05; // Symmetry bonus
     if (geometricAnalysis.features.mouthWidthRatio > 0.3) bonus += 0.05; // Wide smile bonus
+    if (geometricAnalysis.features.mouthCurvature > 0.6) bonus += 0.05; // Strong curvature bonus
     
     const finalConfidence = Math.min(1.0, combinedScore + bonus);
     
-    // FIXED: More sensitive thresholds to catch beautiful smiles
-    const isGenuine = finalConfidence > 0.55 && 
-                     geometricAnalysis.confidence > 0.3 && 
-                     happyScore > 0.2;
+    // FIXED: Even more sensitive thresholds for genuine smiles like paragliding example
+    const isGenuine = finalConfidence > 0.45 && 
+                     geometricAnalysis.confidence > 0.25 && 
+                     happyScore > 0.15;
     
     return {
       confidence: finalConfidence,
