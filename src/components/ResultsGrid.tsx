@@ -1,21 +1,31 @@
 import React from 'react';
 import { Download, DownloadCloud, Clock, Zap, Star } from 'lucide-react';
 import { ExtractedFrame } from '../types';
+// Assuming downloadAllFrames is still used for the ZIP download,
+// but downloadFrame is now handled by onSaveFrame from App.tsx
 import { downloadAllFrames } from '../utils/downloadUtils'; 
 
 interface ResultsGridProps {
   frames: ExtractedFrame[];
+  // Added the onSaveFrame prop, which is the saveFrame function from App.tsx
   onSaveFrame: (frame: ExtractedFrame) => void; 
 }
 
 const ResultsGrid: React.FC<ResultsGridProps> = ({ frames, onSaveFrame }) => {
   if (frames.length === 0) {
-    return null; 
+    return null; // Don't render if no frames
   }
 
   const handleDownloadAll = async () => {
+    // For download all, you might still use a utility function.
+    // If downloadAllFrames also needs video/canvas refs for full res,
+    // you'd need to pass them down or modify downloadAllFrames.
+    // For now, assuming it works with just dataUrls or handles its own canvas.
     await downloadAllFrames(frames);
   };
+
+  // Removed handleDownloadFrame as it's now replaced by the onSaveFrame prop
+
 
   const formatTimestamp = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -60,7 +70,7 @@ const ResultsGrid: React.FC<ResultsGridProps> = ({ frames, onSaveFrame }) => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {frames.map((frame, index) => (
-          <div key={frame.id} className="relative group bg-gray-50 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-200">
+          <div key={frame.id} className="group relative bg-gray-50 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-200">
             {/* Best smile indicator */}
             {index === 0 && frames.length > 1 && (
               <div className="absolute top-2 left-2 z-10 bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center">
@@ -79,6 +89,7 @@ const ResultsGrid: React.FC<ResultsGridProps> = ({ frames, onSaveFrame }) => {
             
             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center">
               <button
+                // *** IMPORTANT CHANGE: Call the onSaveFrame prop directly ***
                 onClick={() => onSaveFrame(frame)} 
                 className="opacity-0 group-hover:opacity-100 transition-opacity bg-white text-gray-800 px-3 py-2 rounded-lg shadow-lg hover:bg-gray-50 transform hover:scale-105"
               >
@@ -140,4 +151,3 @@ const ResultsGrid: React.FC<ResultsGridProps> = ({ frames, onSaveFrame }) => {
 };
 
 export default ResultsGrid;
-
