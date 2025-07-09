@@ -21,7 +21,7 @@ But something inside said: **Keep believing.**
 
 One day, a suggestion sparked: *What if we combine face geometry with smile detection?* That idea — gifted through a moment of conversation with Gemini AI — changed everything. The very first run with that hybrid approach gave me **the most genuine, real smiles** I had ever captured.
 
-And at that exact moment… a plane flew past my window in Madeira, with a heart shape in its vapor trail.
+And at that exact moment… a plane flew past my window in Madeira, with a heart shape printed in its fuselage.
 
 Synchronicity. Magic. Proof that life moves in harmony when we trust it.
 
