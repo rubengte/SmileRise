@@ -1,5 +1,5 @@
-# 😊 SmileRise – Real-Time Smile Recognition & Frame Capture  
-*“When one of us rises… all of us rise together.”*
+# SmileRise – Real-Time Smile Recognition & Frame Capture  
+* Because when one of us rises… all of us rise together.*
 
 ---
 
