@@ -1,11 +1,18 @@
 import { faceDetectionService } from './faceDetection';
 import { ExtractedFrame, ProcessingOptions, ProcessingStats } from '../types';
-import * as faceapi from 'face-api.js'; // Import faceapi for types
+import * as faceapi from 'face-api.js';
 
 // Define parameters for smile buffering and selection
 const SMILE_BUFFER_DURATION_MS = 1000; // How long (ms) to buffer frames for a single smile burst (e.g., 1 second)
 const SMILE_COOLDOWN_DURATION_MS = 3000; // How long (ms) to wait after extracting a smile before looking for a new one (e.g., 3 seconds)
 const MIN_SMILE_DURATION_MS = 200; // Minimum duration (ms) a smile must be detected to be considered valid
+
+// --- NEW: Define the time step for processing frames ---
+const PROCESSING_FRAME_STEP_MS = 250; // Process a frame every 250ms (4 frames per second)
+// You can adjust this:
+// 100ms = 10 frames/sec (more detailed, slower)
+// 250ms = 4 frames/sec (good balance)
+// 500ms = 2 frames/sec (faster, might miss quick smiles)
 
 export class VideoProcessor {
     private videoElement: HTMLVideoElement | null = null;
@@ -16,8 +23,8 @@ export class VideoProcessor {
     private currentSmileBurst: {
         bestFrame: ExtractedFrame | null;
         maxConfidence: number;
-        startTime: number; // Timestamp when the burst started
-        lastDetectionTime: number; // Timestamp of the last frame where a smile was detected in this burst
+        startTime: number; // Timestamp when the burst started (ms)
+        lastDetectionTime: number; // Timestamp of the last frame where a smile was detected in this burst (ms)
     } | null = null;
 
     private smileCooldownActive: boolean = false;
@@ -53,16 +60,20 @@ export class VideoProcessor {
         video.src = URL.createObjectURL(file);
         video.load();
         video.currentTime = 0; // Start from the beginning
-        video.playbackRate = 8; // Speed up video playback for faster processing (adjust as needed)
+        video.playbackRate = 1; // Set playback rate to 1 for accurate seeking during processing
 
         // Ensure video metadata is loaded
-        await new Promise<void>((resolve) => {
+        await new Promise<void>((resolve, reject) => {
             video.onloadedmetadata = () => {
                 // Set canvas dimensions for processing (can be lower than video intrinsic for performance)
                 // We'll use the intrinsic dimensions for final export in App.tsx
                 canvas.width = video.videoWidth; // Use original video width for detection canvas
                 canvas.height = video.videoHeight; // Use original video height for detection canvas
                 resolve();
+            };
+            video.onerror = (e) => {
+                console.error("Video loading error:", e);
+                reject(new Error("Failed to load video metadata."));
             };
         });
 
@@ -71,7 +82,8 @@ export class VideoProcessor {
             throw new Error("Could not get 2D context from canvas.");
         }
 
-        const totalFrames = Math.floor(video.duration * 30); // Estimate total frames (assuming 30 FPS)
+        // Estimate total frames based on the new PROCESSING_FRAME_STEP_MS
+        const estimatedTotalFrames = Math.floor(video.duration * 1000 / PROCESSING_FRAME_STEP_MS);
         let processedFrames = 0;
         let smilingFacesCount = 0;
         const extractedFrames: ExtractedFrame[] = [];
@@ -85,17 +97,31 @@ export class VideoProcessor {
         }
 
         setProcessingStats({
-            totalFrames,
+            totalFrames: estimatedTotalFrames, // Update totalFrames estimate
             processedFrames: 0,
             smilingFaces: 0,
             isProcessing: true
         });
 
-        // Function to process a single frame
-        const processFrame = async (): Promise<boolean> => {
-            if (this.stopProcessingFlag || video.ended) {
-                return false; // Stop if flag is set or video ended
-            }
+        // --- NEW: Loop through video by fixed time steps ---
+        let currentTime = 0;
+        while (currentTime < video.duration && !this.stopProcessingFlag) {
+            video.currentTime = currentTime; // Seek to the current time
+
+            // Wait for the video to actually seek to the new time
+            await new Promise<void>((resolve, reject) => {
+                const onSeeked = () => {
+                    video.removeEventListener('seeked', onSeeked);
+                    resolve();
+                };
+                const onError = (e: Event) => {
+                    video.removeEventListener('error', onError);
+                    console.error("Error during video seek:", e);
+                    reject(new Error("Video seek failed."));
+                };
+                video.addEventListener('seeked', onSeeked);
+                video.addEventListener('error', onError);
+            });
 
             processedFrames++;
             setProcessingStats(prev => ({ ...prev, processedFrames }));
@@ -106,7 +132,7 @@ export class VideoProcessor {
             const detections = await faceDetectionService.detectFaces(video); // Pass video element for consistency
 
             // --- Smile Buffering and Selection Logic ---
-            const currentTimestampMs = video.currentTime * 1000;
+            const currentTimestampMs = video.currentTime * 1000; // Use actual video currentTime
             let smileDetectedInFrame = false;
 
             for (const detection of detections) {
@@ -185,24 +211,15 @@ export class VideoProcessor {
             }
             // --- End Smile Buffering and Selection Logic ---
 
-            // Advance video playback
-            video.currentTime += 1 / video.playbackRate; // Advance by one frame duration (based on playbackRate)
-            return true; // Continue processing
-        };
-
-        // Loop through video frames
-        while (video.currentTime < video.duration && !this.stopProcessingFlag) {
-            const shouldContinue = await processFrame();
-            if (!shouldContinue) break;
-
+            currentTime += PROCESSING_FRAME_STEP_MS / 1000; // Advance by the defined step in seconds
             // Yield control to browser to prevent freezing UI
             await new Promise(requestAnimationFrame);
         }
 
         // Finalize any pending smile burst after video ends
         if (this.currentSmileBurst && this.currentSmileBurst.bestFrame && 
-            (video.currentTime - this.currentSmileBurst.lastDetectionTime * 1000) < SMILE_BUFFER_DURATION_MS &&
-            (video.currentTime * 1000 - this.currentSmileBurst.startTime) >= MIN_SMILE_DURATION_MS) {
+            (video.currentTime * 1000 - this.currentSmileBurst.lastDetectionTime) < SMILE_BUFFER_DURATION_MS && // Check if still within buffer
+            (video.currentTime * 1000 - this.currentSmileBurst.startTime) >= MIN_SMILE_DURATION_MS) { // Check min duration
             extractedFrames.push(this.currentSmileBurst.bestFrame);
             smilingFacesCount++;
             setProcessingStats(prev => ({ ...prev, smilingFaces: smilingFacesCount }));
