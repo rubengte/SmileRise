@@ -85,7 +85,7 @@ This isn’t just code. It’s a seed.
 ## 💌 Contact
 
 If you’ve smiled reading this or testing the app, I’d love to hear from you.  
-Feel free to open an issue, fork the repo, or simply connect:
+Feel free to create your own branch on this tree, or simply connect:
 
 **🌐** [rubengt.com](https://rubengt.com)  
 **📧** [Insight Timer Meditation](https://insighttimer.com/RubenGT)  
