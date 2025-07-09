@@ -63,10 +63,9 @@ Use it, remix it, build upon it, make it yours. Let it evolve.
 ```bash
 SmileRise/
 │
-├── index.html        # Main interface
-├── script.js         # Core logic for detection and capture
-├── style.css         # UI styling
-├── models/           # Face detection models (hosted .wasm / .xml if needed)   
+├── App.tsx           # Main interface
+├── models/           # Face detection models
+├── scr/              # Core logic for detection and capture
 ```
 
 ---
