@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react'; // Added useRef here
 import { Smile, AlertCircle, Info, Brain, CheckCircle } from 'lucide-react';
 import VideoUpload from './components/VideoUpload';
 import ProcessingOptionsComponent from './components/ProcessingOptions';
@@ -62,10 +62,7 @@ function App() {
   }, []);
 
   const handleStartProcessing = useCallback(async () => {
-    if (!selectedFile || !videoRef.current || !canvasRef.current) { // Ensure refs are available
-        setError('Video file not selected or video/canvas elements not ready.');
-        return;
-    }
+    if (!selectedFile) return;
 
     setError(null);
     setExtractedFrames([]);
@@ -73,8 +70,7 @@ function App() {
     setProcessingStats(prev => ({ ...prev, isProcessing: true }));
     
     try {
-      // Pass the actual DOM elements to the VideoProcessor constructor
-      const processor = new VideoProcessor(videoRef.current, canvasRef.current);
+      const processor = new VideoProcessor();
       
       const frames = await processor.processVideo(
         selectedFile,
@@ -82,10 +78,6 @@ function App() {
         setProcessingStats
       );
       
-      // Sort frames by confidence in descending order (highest confidence first)
-      // This ensures the "best" smiles are shown first if maxExtract is used
-      frames.sort((a, b) => b.confidence - a.confidence);
-
       setExtractedFrames(frames);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during processing');
@@ -95,6 +87,7 @@ function App() {
   }, [selectedFile, processingOptions]);
 
 
+  // --- START OF EXPORT QUALITY FIX ---
   // This function is responsible for saving a frame at full video resolution
   const saveFrame = useCallback((frame: ExtractedFrame) => {
     if (!videoRef.current || !canvasRef.current) {
@@ -110,6 +103,7 @@ function App() {
     // This ensures the exported image is not scaled down.
     if (video.videoWidth === 0 || video.videoHeight === 0) {
         console.error("Video has no intrinsic dimensions (not loaded or invalid). Cannot save frame at full resolution.");
+        // Optionally, you could fall back to a smaller resolution or show an error to the user
         return;
     }
 
@@ -118,7 +112,11 @@ function App() {
 
     // Draw the video frame onto the canvas at its full resolution
     // Ensure the video is at the correct timestamp before drawing
-    video.currentTime = frame.timestamp; 
+    // Note: This might cause a brief visual flicker if done directly here
+    // A more robust solution might involve creating a temporary offscreen canvas
+    // or ensuring the video element is already seeking to the correct frame.
+    // For now, we assume the video is paused at the correct frame or will snap to it quickly.
+    video.currentTime = frame.timestamp; // Set video to the exact timestamp of the detected frame
     context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
 
     // Get the image data from the canvas as JPEG with good quality
@@ -131,10 +129,12 @@ function App() {
     const link = document.createElement('a');
     link.href = image;
     link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }, []);
+    document.body.appendChild(link); // Append to body to make it clickable
+    link.click(); // Programmatically click the link
+    document.body.removeChild(link); // Clean up the link element
+  }, []); // Dependencies for useCallback
+
+  // --- END OF EXPORT QUALITY FIX ---
 
 
   return (
