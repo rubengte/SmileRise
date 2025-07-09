@@ -2,7 +2,6 @@ import * as faceapi from 'face-api.js';
 import { ExtractedFace } from './types';
 
 // Define the URL where your face-api.js models are hosted
-// This should be relative to your public folder if bundled, or a full URL if on a CDN
 const MODEL_URL = '/models'; // Assuming models are in public/models/
 
 class FaceDetectionService {
@@ -63,7 +62,9 @@ class FaceDetectionService {
                     detection: detection.detection.box, // Bounding box of the face
                     expressions: detection.expressions,
                     landmarks: detection.landmarks,
-                    timestamp: videoElement.currentTime // Capture the current video time
+                    timestamp: videoElement.currentTime, // Capture the current video time
+                    confidence: detection.expressions.happy || 0, // Add confidence directly
+                    id: Date.now().toString() + Math.random().toString(36).substring(2, 9) // Unique ID
                 });
             }
         }
@@ -76,7 +77,7 @@ class FaceDetectionService {
         const happyScoreThreshold = 0.5; // Lowered from 0.6 to capture more smiles, including subtle ones
         const minSmileAspectRatio = 2.0; // Adjusted from 2.5 - allows for wider, less vertically stretched smiles
         const maxSmileAspectRatio = 6.0; // Remains the same, upper limit to filter extreme distortions
-        const minMouthHeight = 2; // Added a minimum height to ensure mouth is not completely closed or inverted, but allows for very slight opening. Adjust as needed.
+        const minMouthHeight = 0.5; // Adjusted to a very small positive number. Allows for very subtle or almost closed-mouth smiles.
 
         // 1. Expression Score Check
         const happyScore = expressions.happy || 0;
@@ -92,7 +93,6 @@ class FaceDetectionService {
         const lowerLipCenter = mouth[9];   // Center bottom point of the lower lip
 
         // Calculate mouth width (distance between corners)
-        // Corrected: Use Math.abs or ensure right.x - left.x for positive width
         const mouthWidth = Math.sqrt(
             Math.pow(rightMouthCorner.x - leftMouthCorner.x, 2) +
             Math.pow(rightMouthCorner.y - leftMouthCorner.y, 2)
@@ -102,7 +102,7 @@ class FaceDetectionService {
         const mouthHeight = lowerLipCenter.y - upperLipCenter.y;
 
         // Ensure valid dimensions before calculating aspect ratio
-        if (mouthWidth <= 0 || mouthHeight < minMouthHeight) { // Changed from <=0 to < minMouthHeight
+        if (mouthWidth <= 0 || mouthHeight < minMouthHeight) { 
             return false;
         }
 
@@ -110,20 +110,6 @@ class FaceDetectionService {
 
         // 3. Aspect Ratio Check
         const isSmilingGeometric = aspectRatio > minSmileAspectRatio && aspectRatio < maxSmileAspectRatio;
-
-        // Optional: Add more advanced checks for Duchenne smile (eye crinkling) here if needed
-        // This would involve analyzing eye landmarks (e.g., distance between eye corners and eyebrow points)
-        // For example:
-        // const leftEye = landmarks.getLeftEye();
-        // const rightEye = landmarks.getRightEye();
-        // const leftEyeInnerCorner = leftEye[0];
-        // const leftEyeOuterCorner = leftEye[3];
-        // const leftEyebrowInner = landmarks.getLeftEyeBrow()[1];
-        // const leftEyebrowOuter = landmarks.getLeftEyeBrow()[3];
-        // // Calculate vertical distance from eye to eyebrow, or eye aspect ratio for squinting/crinkling
-        // const leftEyeVerticalDistance = Math.abs(leftEyebrowInner.y - leftEye[4].y); // Example: between eyebrow point and lower eyelid point
-        // if (leftEyeVerticalDistance < someThresholdForSquinting) { /* ... */ }
-
 
         return isSmilingGeometric;
     }
