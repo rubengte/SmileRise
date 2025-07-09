@@ -11,7 +11,7 @@ In a world flooded with filters and automation, I wanted to create something tha
 
 This project uses **real-time video processing in the browser** (no server needed) to detect and extract frames containing smiles, with surprising accuracy and a light footprint.
 
-Truly grateful for this approach by Bolt.new, since it is deeply revolutionary. All of it feels like magic, to be able to process a video like this in real for such a complex technological task and make it look simple.
+Truly grateful for this approach by Bolt.new, since it is deeply revolutionary. All of it feels like magic, to be able to process a video like this in real time, with no upload required, for such a complex technological task and make it look simple.
 
 ---
 
