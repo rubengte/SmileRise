@@ -4,7 +4,7 @@ import VideoUpload from './components/VideoUpload';
 import ProcessingOptionsComponent from './components/ProcessingOptions';
 import ProcessingProgress from './components/ProcessingProgress';
 import ResultsGrid from './components/ResultsGrid';
-import { VideoProcessor } from './utils/videoProcessor'; // Import VideoProcessor
+import { VideoProcessor } from './utils/videoProcessor';
 import { faceDetectionService } from './utils/faceDetection';
 import { ExtractedFrame, ProcessingStats, ProcessingOptions } from './types';
 
@@ -24,7 +24,7 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [isRealDetection, setIsRealDetection] = useState<boolean | null>(null);
 
-  // Refs for video and canvas elements (crucial for VideoProcessor)
+  // Refs for video and canvas elements (needed for direct access to DOM properties like videoWidth)
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -82,6 +82,10 @@ function App() {
         setProcessingStats
       );
       
+      // Sort frames by confidence in descending order (highest confidence first)
+      // This ensures the "best" smiles are shown first if maxExtract is used
+      frames.sort((a, b) => b.confidence - a.confidence);
+
       setExtractedFrames(frames);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during processing');
@@ -106,7 +110,6 @@ function App() {
     // This ensures the exported image is not scaled down.
     if (video.videoWidth === 0 || video.videoHeight === 0) {
         console.error("Video has no intrinsic dimensions (not loaded or invalid). Cannot save frame at full resolution.");
-        // Optionally, you could fall back to a smaller resolution or show an error to the user
         return;
     }
 
@@ -115,10 +118,7 @@ function App() {
 
     // Draw the video frame onto the canvas at its full resolution
     // Ensure the video is at the correct timestamp before drawing
-    // Note: This might cause a brief visual flicker if done directly here
-    // A more robust solution might involve creating a temporary offscreen canvas
-    // or ensuring the video element is already seeking to the correct frame.
-    video.currentTime = frame.timestamp; // Set video to the exact timestamp of the detected frame
+    video.currentTime = frame.timestamp; 
     context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
 
     // Get the image data from the canvas as JPEG with good quality
@@ -131,10 +131,10 @@ function App() {
     const link = document.createElement('a');
     link.href = image;
     link.download = fileName;
-    document.body.appendChild(link); // Append to body to make it clickable
-    link.click(); // Programmatically click the link
-    document.body.removeChild(link); // Clean up the link element
-  }, []); // Dependencies for useCallback
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }, []);
 
 
   return (
@@ -151,7 +151,7 @@ function App() {
             </h1>
           </div>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Choose one of you videos (up to 10GB, 30+ minutes) and automatically extract genuine smiling faces using 
+            Upload high-quality videos (up to 10GB, 30+ minutes) and automatically extract genuine smiling faces using 
             <strong> hybrid ML + computer vision technology</strong>. Combines Face-API.js machine learning with geometric analysis for superior accuracy.
           </p>
         </div>
@@ -201,7 +201,7 @@ function App() {
             combined with geometric facial analysis to detect genuine smiles. The hybrid system analyzes facial landmarks, 
             expressions, and geometric features for superior accuracy compared to single-method approaches.
             <br />
-            <strong>Enjoy</strong>
+            <strong>Note:</strong> Enjoy.
           </div>
         </div>
 
