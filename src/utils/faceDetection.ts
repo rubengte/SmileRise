@@ -246,12 +246,17 @@ export class FaceDetectionService {
     if (geometricAnalysis.features.mouthWidthRatio > 0.3) bonus += 0.05; // Wide smile bonus
     if (geometricAnalysis.features.mouthCurvature > 0.6) bonus += 0.05; // Strong curvature bonus
     
+    // NEW: Extra bonus for paragliding-style exuberant smiles
+    if (geometricAnalysis.features.mouthWidthRatio > 0.35 && geometricAnalysis.features.mouthOpennessRatio > 0.12) {
+      bonus += 0.08; // Big open smile bonus (like your paragliding photo!)
+    }
+    
     const finalConfidence = Math.min(1.0, combinedScore + bonus);
     
-    // FIXED: Even more sensitive thresholds for genuine smiles like paragliding example
+    // GENTLE: Maintain current sensitivity while being more inclusive of big smiles
     const isGenuine = finalConfidence > 0.45 && 
                      geometricAnalysis.confidence > 0.25 && 
-                     happyScore > 0.15;
+                     happyScore > 0.12; // GENTLE: Slightly lower ML threshold for exuberant expressions
     
     return {
       confidence: finalConfidence,
