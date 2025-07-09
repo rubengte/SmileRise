@@ -66,8 +66,7 @@ SmileRise/
 ├── index.html        # Main interface
 ├── script.js         # Core logic for detection and capture
 ├── style.css         # UI styling
-├── models/           # Face detection models (hosted .wasm / .xml if needed)
-└── example_videos/   # (Optional) Sample clips to test
+├── models/           # Face detection models (hosted .wasm / .xml if needed)   
 ```
 
 ---
