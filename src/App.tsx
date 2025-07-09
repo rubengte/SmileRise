@@ -1,10 +1,10 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react'; // Added useRef here
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Smile, AlertCircle, Info, Brain, CheckCircle } from 'lucide-react';
 import VideoUpload from './components/VideoUpload';
 import ProcessingOptionsComponent from './components/ProcessingOptions';
 import ProcessingProgress from './components/ProcessingProgress';
 import ResultsGrid from './components/ResultsGrid';
-import { VideoProcessor } from './utils/videoProcessor';
+import { VideoProcessor } from './utils/videoProcessor'; // Import VideoProcessor
 import { faceDetectionService } from './utils/faceDetection';
 import { ExtractedFrame, ProcessingStats, ProcessingOptions } from './types';
 
@@ -24,7 +24,7 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [isRealDetection, setIsRealDetection] = useState<boolean | null>(null);
 
-  // Refs for video and canvas elements (needed for direct access to DOM properties like videoWidth)
+  // Refs for video and canvas elements (crucial for VideoProcessor)
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -62,7 +62,10 @@ function App() {
   }, []);
 
   const handleStartProcessing = useCallback(async () => {
-    if (!selectedFile) return;
+    if (!selectedFile || !videoRef.current || !canvasRef.current) { // Ensure refs are available
+        setError('Video file not selected or video/canvas elements not ready.');
+        return;
+    }
 
     setError(null);
     setExtractedFrames([]);
@@ -70,7 +73,8 @@ function App() {
     setProcessingStats(prev => ({ ...prev, isProcessing: true }));
     
     try {
-      const processor = new VideoProcessor();
+      // Pass the actual DOM elements to the VideoProcessor constructor
+      const processor = new VideoProcessor(videoRef.current, canvasRef.current);
       
       const frames = await processor.processVideo(
         selectedFile,
@@ -87,7 +91,6 @@ function App() {
   }, [selectedFile, processingOptions]);
 
 
-  // --- START OF EXPORT QUALITY FIX ---
   // This function is responsible for saving a frame at full video resolution
   const saveFrame = useCallback((frame: ExtractedFrame) => {
     if (!videoRef.current || !canvasRef.current) {
@@ -115,7 +118,6 @@ function App() {
     // Note: This might cause a brief visual flicker if done directly here
     // A more robust solution might involve creating a temporary offscreen canvas
     // or ensuring the video element is already seeking to the correct frame.
-    // For now, we assume the video is paused at the correct frame or will snap to it quickly.
     video.currentTime = frame.timestamp; // Set video to the exact timestamp of the detected frame
     context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
 
@@ -134,8 +136,6 @@ function App() {
     document.body.removeChild(link); // Clean up the link element
   }, []); // Dependencies for useCallback
 
-  // --- END OF EXPORT QUALITY FIX ---
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -151,7 +151,7 @@ function App() {
             </h1>
           </div>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Upload high-quality videos (up to 10GB, 30+ minutes) and automatically extract genuine smiling faces using 
+            Choose one of you videos (up to 10GB, 30+ minutes) and automatically extract genuine smiling faces using 
             <strong> hybrid ML + computer vision technology</strong>. Combines Face-API.js machine learning with geometric analysis for superior accuracy.
           </p>
         </div>
@@ -201,7 +201,7 @@ function App() {
             combined with geometric facial analysis to detect genuine smiles. The hybrid system analyzes facial landmarks, 
             expressions, and geometric features for superior accuracy compared to single-method approaches.
             <br />
-            <strong>Note:</strong> Enjoy.
+            <strong>Enjoy</strong>
           </div>
         </div>
 
