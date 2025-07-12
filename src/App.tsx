@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Smile, AlertCircle, Info, Brain, CheckCircle } from 'lucide-react';
+import { Smile, AlertCircle, Info, CheckCircle } from 'lucide-react';
 import VideoUpload from './components/VideoUpload';
 import ProcessingOptionsComponent from './components/ProcessingOptions';
 import ProcessingProgress from './components/ProcessingProgress';
@@ -39,7 +39,6 @@ function App() {
   }, []);
 
   const handleVideoSelect = useCallback((file: File) => {
-    // Validate file size (max 10GB for high-quality videos)
     const maxSize = 10 * 1024 * 1024 * 1024; // 10GB
     if (file.size > maxSize) {
       setError('Video file is too large. Please choose a file smaller than 10GB.');
@@ -62,23 +61,20 @@ function App() {
 
     setError(null);
     setExtractedFrames([]);
-    
     setProcessingStats(prev => ({ ...prev, isProcessing: true }));
-    
+
     try {
       const processor = new VideoProcessor();
-      
       const frames = await processor.processVideo(
         selectedFile,
         processingOptions,
         setProcessingStats
       );
-      
       setExtractedFrames(frames);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during processing');
     } finally {
-        setProcessingStats(prev => ({ ...prev, isProcessing: false }));
+      setProcessingStats(prev => ({ ...prev, isProcessing: false }));
     }
   }, [selectedFile, processingOptions]);
 
@@ -96,17 +92,16 @@ function App() {
             </h1>
           </div>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Select high-quality videos (up to 10GB, 30+ minutes) and automatically extract genuine smiling faces using 
-            <strong> hybrid ML + computer vision technology</strong>. <br>Combines Face-API.js machine learning with geometric analysis for superior accuracy.
+            Select high-quality videos (up to 10GB, 30+ minutes) and automatically extract genuine smiling faces using{' '}
+            <strong>hybrid ML + computer vision technology</strong>. <br />
+            Combines Face-API.js machine learning with geometric analysis for superior accuracy.
           </p>
         </div>
 
         {/* Detection Status Banner */}
         {isRealDetection !== null && (
           <div className={`mb-6 p-4 border rounded-lg flex items-start ${
-            isRealDetection 
-              ? 'bg-green-50 border-green-200' 
-              : 'bg-red-50 border-red-200'
+            isRealDetection ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
           }`}>
             {isRealDetection ? (
               <CheckCircle className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5 text-green-600" />
@@ -115,16 +110,14 @@ function App() {
             )}
             <div className={`text-sm ${isRealDetection ? 'text-green-800' : 'text-red-800'}`}>
               <strong>
-                {isRealDetection 
-                  ? '🎯 Advanced Face-API.js machine learning + Geometric Analysis ACTIVE!' 
-                  : '❌ Face-API.js Detection Failed!'
-                }
+                {isRealDetection
+                  ? '🎯 Advanced Face-API.js machine learning + Geometric Analysis ACTIVE!'
+                  : '❌ Face-API.js Detection Failed!'}
               </strong>
               <p className="mt-1">
-                {isRealDetection 
+                {isRealDetection
                   ? 'This hybrid approach analyzes facial landmarks, expressions, and geometric features for superior accuracy in smile detection'
-                  : 'Failed to load Face-API.js models. The models may be loading from CDN - please wait a moment and refresh if needed.'
-                }
+                  : 'Failed to load Face-API.js models. The models may be loading from CDN - please wait a moment and refresh if needed.'}
               </p>
               <p className="mt-1 text-xs opacity-75">
                 Detection method: {faceDetectionService.getDetectionMethod()}
@@ -142,7 +135,7 @@ function App() {
         <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start">
           <Info className="w-5 h-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-blue-800">
-            <strong>Open sourse technology :</strong> you can contribute and make this code grow stronger and more precise. All files are on GitHub.
+            <strong>Open source technology:</strong> you can contribute and make this code grow stronger and more precise. All files are on GitHub.
           </div>
         </div>
 
@@ -162,6 +155,7 @@ function App() {
             </p>
           </div>
         </div>
+
         {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start">
@@ -176,7 +170,7 @@ function App() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           {/* Upload Section */}
           <div className="lg:col-span-2">
-            <VideoUpload 
+            <VideoUpload
               onVideoSelect={handleVideoSelect}
               isProcessing={processingStats.isProcessing}
             />
@@ -202,7 +196,7 @@ function App() {
                   onClick={handleStartProcessing}
                   disabled={!isRealDetection}
                   className={`w-full px-4 py-3 rounded-lg transition-all transform font-medium shadow-sm ${
-                    isRealDetection 
+                    isRealDetection
                       ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white hover:scale-105 hover:shadow-md'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
@@ -225,7 +219,7 @@ function App() {
         {/* Info Footer */}
         <div className="mt-12 text-center text-gray-500 text-sm">
           <p>This app processes videos client-side using Face-api.js machine learning combined with computer vision. No data is sent to external servers.</p>
-          <p className="mt-1">Supports high-quality videos up to 10GB and 30+ minutes. Outputs full quality frames and so the better the video resolution the better the frames extracted .</p>
+          <p className="mt-1">Supports high-quality videos up to 10GB and 30+ minutes. Outputs full quality frames — the better the video resolution, the better the results.</p>
           <p className="mt-1">Open source files available on GitHub.</p>
         </div>
       </div>
