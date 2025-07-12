@@ -50,7 +50,7 @@ Synchronicity. Magic. Proof that life moves in harmony when we trust it.
 
 This project doesn’t belong to me — not really. It came *through* me, like many beautiful things in life do. I’ve chosen to keep it **fully open-source**, because I believe that knowledge, tools, and joy are meant to be shared.
 
-Use it, remix it, build upon it, make it yours. Let it evolve.
+Use and remix it, build and expand it. Let it evolve.
 
 ---
 
