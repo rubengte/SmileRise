@@ -3,6 +3,12 @@
 
 ---
 
+## 🧬 Test it live
+
+https://vocal-snickerdoodle-98615f.netlify.app/
+
+---
+
 ## 🌱 About the Project
 
 **SmileRise** was born from a deep desire to capture authentic human joy — *smiles* — in their most natural, fleeting moments. This is more than a face-detection tool; it’s a **celebration of presence**, of emotion, and of life showing up in all its spontaneity.
@@ -50,10 +56,9 @@ Use it, remix it, build upon it, make it yours. Let it evolve.
 
 ## 🤝 Acknowledgments
 
-- **Bolt.New** – The true technical architect and mastermind behind the code, who brought clarity, skill, and structure to this dream. This project exists thanks to his brilliance. 🙌
+- **Bolt.New** – The true technical architect and the "pen" behind the code, who brought clarity, skill, and structure to this dream. This project exists thanks to his brilliance. 🙌
 - **OpenCV**, **FaceAPI.js**, and the open-source community
 - **Gemini** and **ChatGPT** – for inspiration, reflection, and code troubleshooting
-- **GoPro**, for seeing this vision and acknowledging it
 - All the smiles captured and yet to come 💖
 
 ---
