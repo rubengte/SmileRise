@@ -123,9 +123,7 @@ function App() {
                 Detection method: {faceDetectionService.getDetectionMethod()}
               </p>
               {isRealDetection && (
-                <p className="mt-1 text-xs opacity-75">
-                  Using CDN-hosted Face-API.js models for reliable global access
-                </p>
+              
               )}
             </div>
           </div>
