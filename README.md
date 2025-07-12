@@ -81,7 +81,7 @@ This is only the beginning.
 
 Imagine this embedded into cameras, shared with communities, used by filmmakers, artists, therapists — anyone wanting to reconnect with what makes us truly *feel*.
 
-If you have ideas or improvements, I welcome them.  
+If you have ideas or improvements, they are welcome.  
 This isn’t just code. It’s a seed.
 
 ---
