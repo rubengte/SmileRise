@@ -11,13 +11,14 @@ https://vocal-snickerdoodle-98615f.netlify.app/
 
 ## 🌱 About the Project
 
-**SmileRise** was born from a deep desire to capture authentic human joy — *smiles* — in their most natural, fleeting moments. This is more than a face-detection tool; it’s a **celebration of presence**, of emotion, and of life showing up in all its spontaneity.
+**SmileRise** was born from a deep desire to capture authentic human joy — *smiles* — in their most natural, fleeting moments. This is more than a face-detection tool, it’s a **celebration of presence**, of emotion, and of life showing up in all its spontaneity.
 
 In a world flooded with filters, I wanted to create something that honors the real — the *genuine smiles* that rise from within.
 
 This project uses **real-time video processing in the browser** (no server needed) to detect and extract frames containing smiles, with surprising accuracy and a light footprint.
 
-Truly grateful for this approach by Bolt.new, since it is deeply revolutionary. All of it feels like magic, to be able to process a video like this in real time, with no upload required, for such a complex technological task and make it look simple.
+Truly grateful for this suggested approach by Bolt.new, since it is deeply revolutionary. 
+All of it feels like magic, to be able to process a video in real time, with no upload required, such a complex technological task while making it look simple.
 
 ---
 
