@@ -68,9 +68,9 @@ Use and remix it, build and expand it. Let it evolve.
 ```bash
 SmileRise/
 │
-├── App.tsx           # Main interface
 ├── models/           # Face detection models
 ├── scr/              # Core logic for detection and capture
+├── src/App.tsx           # Main interface
 ```
 
 ---
