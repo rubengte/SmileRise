@@ -5,7 +5,7 @@
 
 ## 🧬 Test it live
 
-https://vocal-snickerdoodle-98615f.netlify.app/
+https://smilerise.netlify.app/
 
 ---
 
