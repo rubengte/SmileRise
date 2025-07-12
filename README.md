@@ -41,7 +41,7 @@ Synchronicity. Magic. Proof that life moves in harmony when we trust it.
 - 🧠 Browser-based smile detection using **FaceAPI + geometry analysis**
 - 📸 Real-time frame extraction from uploaded videos
 - 🎞️ Selects only the most *genuine* smiles with high accuracy
-- 🖼️ Exports full-resolution frames (tested with 1080p+ input)
+- 🖼️ Exports full-resolution frames (tested with 1080p, 2.7k+ input)
 - 🛠️ No server or backend required – fully client-side
 - 💻 Built with web technologies, OpenCV alternatives, and love
 
