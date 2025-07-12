@@ -122,7 +122,11 @@ function App() {
               <p className="mt-1 text-xs opacity-75">
                 Detection method: {faceDetectionService.getDetectionMethod()}
               </p>
-              {isRealDetection && }
+              {isRealDetection && (
+                <p className="mt-1 text-xs text-green-700">
+                  Detection is running in advanced hybrid mode.
+                </p>
+              )}
             </div>
           </div>
         )}
