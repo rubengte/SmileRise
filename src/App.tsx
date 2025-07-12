@@ -122,9 +122,7 @@ function App() {
               <p className="mt-1 text-xs opacity-75">
                 Detection method: {faceDetectionService.getDetectionMethod()}
               </p>
-              {isRealDetection && (
-              
-              )}
+              {isRealDetection && }
             </div>
           </div>
         )}
