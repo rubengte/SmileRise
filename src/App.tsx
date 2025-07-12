@@ -220,7 +220,9 @@ function App() {
         <div className="mt-12 text-center text-gray-500 text-sm">
           <p>This app processes videos client-side using Face-api.js machine learning combined with computer vision. No data is sent to external servers.</p>
           <p className="mt-1">Supports high-quality videos up to 10GB and 30+ minutes. Outputs full quality frames — the better the video resolution, the better the results.</p>
-          <p className="mt-1">Open source files available on GitHub.</p>
+          <p className="mt-1">Open source files available on  <a href="https://github.com/rubengte/SmileRise" target="_blank" rel="noopener noreferrer">
+          GitHub.
+        </a> </p>
         </div>
       </div>
     </div>
