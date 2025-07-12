@@ -96,8 +96,8 @@ function App() {
             </h1>
           </div>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Upload high-quality videos (up to 10GB, 30+ minutes) and automatically extract genuine smiling faces using 
-            <strong> hybrid ML + computer vision technology</strong>. Combines Face-API.js machine learning with geometric analysis for superior accuracy.
+            Select high-quality videos (up to 10GB, 30+ minutes) and automatically extract genuine smiling faces using 
+            <strong> hybrid ML + computer vision technology</strong>. <br>Combines Face-API.js machine learning with geometric analysis for superior accuracy.
           </p>
         </div>
 
@@ -116,13 +116,13 @@ function App() {
             <div className={`text-sm ${isRealDetection ? 'text-green-800' : 'text-red-800'}`}>
               <strong>
                 {isRealDetection 
-                  ? '🎯 Advanced Face-API.js + Geometric Analysis ACTIVE!' 
+                  ? '🎯 Advanced Face-API.js machine learning + Geometric Analysis ACTIVE!' 
                   : '❌ Face-API.js Detection Failed!'
                 }
               </strong>
               <p className="mt-1">
                 {isRealDetection 
-                  ? 'Using advanced Face-API.js machine learning models combined with geometric facial analysis for precise smile detection. This hybrid approach analyzes facial landmarks, expressions, and geometric features for superior accuracy!'
+                  ? 'This hybrid approach analyzes facial landmarks, expressions, and geometric features for superior accuracy in smile detection'
                   : 'Failed to load Face-API.js models. The models may be loading from CDN - please wait a moment and refresh if needed.'
                 }
               </p>
@@ -142,11 +142,7 @@ function App() {
         <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start">
           <Info className="w-5 h-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-blue-800">
-            <strong>Advanced ML + Computer Vision Technology:</strong> This app uses Face-API.js machine learning models 
-            combined with geometric facial analysis to detect genuine smiles. The hybrid system analyzes facial landmarks, 
-            expressions, and geometric features for superior accuracy compared to single-method approaches.
-            <br />
-            <strong>Note:</strong> Enjoy.
+            <strong>Open sourse technology :</strong> you can contribute and make this code grow stronger and more precise. All files are on GitHub.
           </div>
         </div>
 
@@ -228,9 +224,9 @@ function App() {
 
         {/* Info Footer */}
         <div className="mt-12 text-center text-gray-500 text-sm">
-          <p>This app processes videos client-side using real OpenCV.js computer vision. No data is sent to external servers.</p>
-          <p className="mt-1">Supports high-quality GoPro videos up to 10GB and 30+ minutes. Uses genuine Haar cascade classifiers for accurate detection.</p>
-          <p className="mt-1">OpenCV files hosted on Netlify CDN for reliable global access.</p>
+          <p>This app processes videos client-side using Face-api.js machine learning combined with computer vision. No data is sent to external servers.</p>
+          <p className="mt-1">Supports high-quality videos up to 10GB and 30+ minutes. Outputs full quality frames and so the better the video resolution the better the frames extracted .</p>
+          <p className="mt-1">Open source files available on GitHub.</p>
         </div>
       </div>
     </div>
