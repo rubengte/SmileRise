@@ -43,7 +43,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ onVideoSelect, isProcessing }
         
         <div>
           <h3 className="text-lg font-semibold text-gray-800 mb-2">
-            Upload High-Quality Video File
+            Choose Video File
           </h3>
           <p className="text-gray-600 mb-4">
             Drag and drop your video here, or click to select
@@ -52,7 +52,7 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ onVideoSelect, isProcessing }
             Supports MP4, AVI, MOV, WebM (up to 10GB, 30+ minutes)
           </p>
           <p className="text-xs text-blue-600 font-medium">
-            Perfect for GoPro 2.7K/4K videos and long recordings
+            Perfect for 2.7K/4K videos and long recordings
           </p>
         </div>
 
