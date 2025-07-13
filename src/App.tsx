@@ -94,7 +94,15 @@ function App() {
       <img
         src="https://raw.githubusercontent.com/rubengte/SmileRise/refs/heads/main/smilerise-banner.webp"
         alt="SmileRise Banner"
-        className="banner"
+        style={{
+          width: '100%',
+          maxWidth: '800px',
+          height: 'auto',
+          borderRadius: '12px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          margin: '0 auto 2rem',
+          display: 'block'
+        }}
       />
           </div>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
