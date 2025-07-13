@@ -49,10 +49,10 @@ const VideoUpload: React.FC<VideoUploadProps> = ({ onVideoSelect, isProcessing }
             Drag and drop your video here, or click to select
           </p>
           <p className="text-sm text-gray-500 mb-4">
-            Supports MP4, AVI, MOV, WebM (up to 10GB, 30+ minutes)
+            Supports MP4, AVI, MOV, WebM (up to 10GB)
           </p>
           <p className="text-xs text-blue-600 font-medium">
-            Perfect for 2.7K/4K videos and long recordings
+            Perfect for 2.7K/4K videos
           </p>
         </div>
 
