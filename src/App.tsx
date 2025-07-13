@@ -92,7 +92,7 @@ function App() {
             </h1>
               {/* Banner image */}
       <img
-        src="/smilerise-banner.jpg"
+        src="/smilerise-banner.webp"
         alt="SmileRise Banner"
         className="banner"
       />
