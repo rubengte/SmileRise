@@ -90,6 +90,12 @@ function App() {
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
               Real Smile Detection Pro
             </h1>
+              {/* Banner image */}
+      <img
+        src="/smilerise-banner.jpg"
+        alt="SmileRise Banner"
+        className="banner"
+      />
           </div>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
             Select high-quality videos (up to 10GB, 30+ minutes) and automatically extract genuine smiling faces using{' '}
