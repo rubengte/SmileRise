@@ -166,7 +166,7 @@ function App() {
               <li><strong>Processing runs locally</strong> - your video never leaves your device for privacy</li>
             </ul>
             <p className="mt-2 text-xs text-green-700">
-              Browser background throttling slows down or pauses video processing. Staying active ensures ideal performance!
+              Browser background throttling can pause video processing. Staying active ensures ideal performance!
             </p>
           </div>
         </div>
