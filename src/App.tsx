@@ -107,9 +107,8 @@ function App() {
               
           </div>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Select high-quality videos (up to 10GB, 30+ minutes) and automatically extract genuine smiling faces using{' '}
-            <strong>hybrid ML + computer vision technology</strong>. <br />
-            Combines Face-API.js machine learning with geometric analysis for superior accuracy.
+            Select a video (up to 10GB) and automatically extract genuine smiling faces using{' '}
+            <strong>a hybrid technology approach, combining Face-API.js machine learning with computer vision geometric analysis</strong>. <br />
           </p>
         </div>
 
