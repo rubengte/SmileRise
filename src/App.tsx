@@ -83,14 +83,7 @@ function App() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <div className="p-3 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full mr-3">
-              <Smile className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Real Smile Detection Pro
-            </h1>
-              {/* Banner image */}
+          {/* Banner image */}
       <img
         src="https://raw.githubusercontent.com/rubengte/SmileRise/refs/heads/main/smilerise-banner.webp"
         alt="SmileRise Banner"
@@ -104,6 +97,14 @@ function App() {
           display: 'block'
         }}
       />
+          <div className="flex items-center justify-center mb-4">
+            <div className="p-3 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full mr-3">
+              <Smile className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              Real Smile Detection Pro
+            </h1>
+              
           </div>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
             Select high-quality videos (up to 10GB, 30+ minutes) and automatically extract genuine smiling faces using{' '}
