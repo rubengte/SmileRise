@@ -94,7 +94,7 @@ Feel free to create your own branch on this tree, or simply connect:
 
 **🌐** [rubengt.com](https://rubengt.com)  
 **📧** [Insight Timer Meditation](https://insighttimer.com/RubenGT)  
-**📖** [My book – “See The World Through Child’s Eyes”](https://rubengt.com/book)
+**📖** [Book – “See The World Through Child’s Eyes”](https://rubengt.com/book)
 
 ---
 
