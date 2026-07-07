@@ -21,9 +21,9 @@ export default defineConfig({
         display: 'standalone',
         icons: [
           {
-            src: '/vite.svg',
+            src: '/SmileRise-logo192.png',
             sizes: '192x192',
-            type: 'image/svg+xml'
+            type: 'image/png'
           },
           {
             src: '/SmileRise-logo512.png',
