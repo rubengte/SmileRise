@@ -17,7 +17,7 @@ export default defineConfig({
         short_name: 'SmileRise',
         description: 'Capture frames with Smiling Faces from Videos',
         theme_color: '#EAE3DB',
-        background_color: '#d4cbc1',
+        background_color: '#c4b9ad',
         display: 'standalone',
         icons: [
           {
