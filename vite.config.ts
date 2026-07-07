@@ -13,8 +13,8 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
       },
       manifest: {
-        name: 'SmileRise V2',
-        short_name: 'SmileRise V2',
+        name: 'SmileRise',
+        short_name: 'SmileRise',
         description: 'Capture frames with Smiling Faces from Videos',
         theme_color: '#EAE3DB',
         background_color: '#b0a497',
