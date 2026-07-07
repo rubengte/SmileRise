@@ -8,6 +8,10 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      // Explicitly increase the cache limit to allow offline storage of the OpenCV models
+      workbox: {
+        maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
+      },
       manifest: {
         name: 'SmileRise',
         short_name: 'SmileRise',
